@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1788985967168,
+      "tag": "0000_create_finance_core",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788986024885,
+      "tag": "0001_bootstrap_and_demo_data",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788986059962,
+      "tag": "0002_ensure_profile_function",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789220578039,
+      "tag": "0003_restrict_function_execute",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789234866838,
+      "tag": "0004_revoke_anon_table_access",
+      "breakpoints": true
+    }
+  ]
+}

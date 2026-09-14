@@ -1,0 +1,20 @@
+REVOKE ALL ON public.profiles FROM anon;
+REVOKE ALL ON public.accounts FROM anon;
+REVOKE ALL ON public.credit_cards FROM anon;
+REVOKE ALL ON public.categories FROM anon;
+REVOKE ALL ON public.transactions FROM anon;
+REVOKE ALL ON public.commitments FROM anon;
+REVOKE ALL ON public.goals FROM anon;
+REVOKE ALL ON public.budgets FROM anon;
+REVOKE ALL ON public.notifications FROM anon;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.accounts TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.credit_cards TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.categories TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.transactions TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.commitments TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.goals TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.budgets TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.notifications TO authenticated;
+GRANT ALL ON public.profiles, public.accounts, public.credit_cards, public.categories, public.transactions, public.commitments, public.goals, public.budgets, public.notifications TO service_role;
