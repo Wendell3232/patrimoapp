@@ -1,11 +1,27 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Send, Sparkles } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowRight,
+  Bot,
+  CalendarClock,
+  CheckCircle2,
+  CreditCard,
+  HelpCircle,
+  Lightbulb,
+  MessageSquare,
+  PiggyBank,
+  Send,
+  Sparkles,
+  Target,
+  Wallet,
+} from "lucide-react";
 
 import { AppShell } from "@/components/app/AppShell";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { askAgent } from "@/lib/agent.functions";
@@ -15,9 +31,8 @@ import {
   cardUsedLimit,
   expensesByCategory,
   futureCommitments,
-  netWorth,
+  goalPacing,
   periodTotals,
-  requiredMonthlySaving,
 } from "@/lib/finance";
 import { formatBRL, monthKeyToday, toISODate } from "@/lib/format";
 
@@ -25,9 +40,15 @@ export const Route = createFileRoute("/_authenticated/agente")({
   head: () => ({
     meta: [
       { title: "Agente Financeiro — Patrimo" },
-      { name: "description", content: "Insights automáticos e perguntas sobre os seus números." },
+      {
+        name: "description",
+        content: "Assistente inteligente com leitura clara dos seus números e insights práticos.",
+      },
       { property: "og:title", content: "Agente Financeiro — Patrimo" },
-      { property: "og:description", content: "Insights automáticos e perguntas sobre os seus números." },
+      {
+        property: "og:description",
+        content: "Assistente inteligente com leitura clara dos seus números e insights práticos.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -35,91 +56,127 @@ export const Route = createFileRoute("/_authenticated/agente")({
   component: Agente,
 });
 
+interface StructuredInsight {
+  id: string;
+  icon: typeof Sparkles;
+  whatHappened: string;
+  whyItMatters: string;
+  whatToDo: string;
+  actions: { label: string; to: string }[];
+}
+
+const SUGGESTED_QUESTIONS = [
+  "Onde estou gastando mais este mês?",
+  "Quanto posso gastar até o fim do mês?",
+  "Quais contas vencem esta semana?",
+  "Estou conseguindo cumprir minhas metas?",
+  "Quais gastos posso revisar?",
+  "Como está o uso dos meus cartões de crédito?",
+];
+
 function Agente() {
   const { data, isLoading } = useFinance();
+  const navigate = useNavigate();
   const ask = useServerFn(askAgent);
+
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const insights = useMemo(() => {
-    if (!data) return [];
+  // Resumo mensal no topo e 3 insights estruturados
+  const { monthSummary, topInsights } = useMemo(() => {
+    if (!data) return { monthSummary: "", topInsights: [] };
+
     const month = monthKeyToday();
     const start = `${month}-01`;
     const end = toISODate(new Date());
     const totals = periodTotals(data.transactions, start, end);
-    const out: string[] = [];
 
-    out.push(
-      `Seu patrimônio atual é ${formatBRL(netWorth(data.accounts, data.transactions))}, somando todas as contas.`,
-    );
-
-    out.push(
+    const monthSummary =
       totals.result >= 0
-        ? `Neste mês entraram ${formatBRL(totals.income)} e saíram ${formatBRL(totals.expense)}, com sobra de ${formatBRL(totals.result)}.`
-        : `Neste mês você gastou ${formatBRL(Math.abs(totals.result))} mais do que recebeu.`,
-    );
+        ? `Este mês entraram ${formatBRL(totals.income)}, saíram ${formatBRL(totals.expense)} e sobraram ${formatBRL(totals.result)}.`
+        : `Este mês entraram ${formatBRL(totals.income)}, saíram ${formatBRL(totals.expense)} e faltaram ${formatBRL(Math.abs(totals.result))}.`;
 
-    const top = expensesByCategory(data.transactions, data.categories, start, end)[0];
-    if (top) {
-      out.push(
-        `A maior despesa do mês é ${top.name}: ${formatBRL(top.total)}, ${top.share.toFixed(0)}% do total gasto.`,
-      );
+    const insights: StructuredInsight[] = [];
+
+    // 1. Maior categoria de despesa
+    const topCategory = expensesByCategory(data.transactions, data.categories, start, end)[0];
+    if (topCategory && topCategory.total > 0) {
+      insights.push({
+        id: "top-expense",
+        icon: PiggyBank,
+        whatHappened: `Você gastou mais com ${topCategory.name} neste mês: ${formatBRL(topCategory.total)}.`,
+        whyItMatters: `Isso representa ${topCategory.share.toFixed(0)}% de todas as suas despesas do período.`,
+        whatToDo: "Verifique se esses gastos estão de acordo com o seu planejamento.",
+        actions: [
+          { label: `Ver gastos de ${topCategory.name}`, to: "/movimentacoes" },
+          { label: "Definir orçamento", to: "/orcamentos" },
+        ],
+      });
     }
 
-    for (const status of budgetStatus(data.budgets, data.categories, data.transactions, month)) {
-      if (status.level === "excedido") {
-        out.push(
-          `O orçamento de ${status.category?.name ?? "categoria"} passou do limite: ${formatBRL(status.spent)} de ${formatBRL(status.budget.limit_amount)}.`,
-        );
-      } else if (status.level === "atencao") {
-        out.push(
-          `O orçamento de ${status.category?.name ?? "categoria"} já usou ${status.usage.toFixed(0)}% do limite.`,
-        );
-      }
+    // 2. Próximos pagamentos
+    const upcoming = futureCommitments(data.commitments)[0];
+    if (upcoming && upcoming.despesas > 0) {
+      insights.push({
+        id: "upcoming-bills",
+        icon: CalendarClock,
+        whatHappened: `Você tem ${formatBRL(upcoming.despesas)} em pagamentos previstos para ${upcoming.label}.`,
+        whyItMatters: "Conhecer as saídas com antecedência evita juros e surpresas no saldo.",
+        whatToDo: "Confira as datas de vencimento e reserve o saldo na sua conta bancária.",
+        actions: [
+          { label: "Ver contas futuras", to: "/compromissos" },
+          { label: "Ver cartões", to: "/cartoes" },
+        ],
+      });
     }
 
-    for (const card of data.cards.filter((c) => !c.archived)) {
-      const used = cardUsedLimit(card, data.transactions);
-      if (card.limit_amount > 0 && used / card.limit_amount >= 0.7) {
-        out.push(
-          `O cartão ${card.name} está com ${((used / card.limit_amount) * 100).toFixed(0)}% do limite comprometido.`,
-        );
-      }
+    // 3. Metas prioritárias
+    if (data.goals.length > 0) {
+      const activeGoal = data.goals[0];
+      const pacing = goalPacing(activeGoal);
+      insights.push({
+        id: "goal-insight",
+        icon: Target,
+        whatHappened: `Para a meta "${activeGoal.name}", faltam ${formatBRL(pacing.missing)}.`,
+        whyItMatters: `Guardando ${formatBRL(pacing.monthlyNeeded)} por mês você alcança o prazo estipulado.`,
+        whatToDo: "Separe uma quantia neste mês para manter o ritmo sem aperto.",
+        actions: [
+          { label: "Ver detalhes da meta", to: "/metas" },
+          { label: "Registrar valor guardado", to: "/metas" },
+        ],
+      });
     }
 
-    const nextMonth = futureCommitments(data.commitments)[0];
-    if (nextMonth) {
-      out.push(
-        `Em ${nextMonth.label} você tem ${formatBRL(nextMonth.despesas)} de compromissos já registrados.`,
-      );
-    }
-
-    for (const goal of data.goals) {
-      out.push(
-        `Para a meta ${goal.name}, guarde ${formatBRL(requiredMonthlySaving(goal))} por mês até o prazo.`,
-      );
-    }
-
-    return out;
+    // Limitar rigorosamente a no máximo 3 insights principais
+    return {
+      monthSummary,
+      topInsights: insights.slice(0, 3),
+    };
   }, [data]);
 
-  async function submit() {
-    if (question.trim().length < 3) {
-      setError("Escreva sua pergunta com um pouco mais de detalhe.");
+  async function handleAsk(queryToAsk?: string) {
+    const q = (queryToAsk ?? question).trim();
+    if (q.length < 3) {
+      setError("Escreva sua dúvida com mais detalhes.");
       return;
     }
     setPending(true);
     setError(null);
     try {
-      const result = await ask({ data: { question: question.trim() } });
+      const result = await ask({ data: { question: q } });
       setAnswer(result.answer);
     } catch {
       setError("Não consegui analisar agora. Tente novamente em instantes.");
     } finally {
       setPending(false);
     }
+  }
+
+  function handleSelectQuestion(q: string) {
+    setQuestion(q);
+    void handleAsk(q);
   }
 
   if (isLoading || !data) {
@@ -131,54 +188,156 @@ function Agente() {
   }
 
   return (
-    <AppShell title="Agente Financeiro" description="Leitura automática dos seus dados">
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Sparkles className="h-4 w-4 text-primary" />
-              Insights automáticos
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {insights.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                Registre lançamentos para receber análises.
-              </p>
-            ) : (
-              insights.map((insight) => (
-                <p key={insight} className="rounded-lg bg-muted px-4 py-3 text-sm">
-                  {insight}
-                </p>
-              ))
-            )}
-          </CardContent>
-        </Card>
+    <AppShell
+      title="Agente Financeiro"
+      description="Assistente inteligente com explicações acolhedoras sobre os seus números"
+    >
+      <div className="space-y-6">
+        {/* RESUMO SIMPLES NO TOPO */}
+        <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
+          <Sparkles className="h-5 w-5 shrink-0 text-primary" />
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+              Visão rápida do mês
+            </span>
+            <p className="mt-0.5 font-bold text-base text-foreground sm:text-lg">
+              {monthSummary}
+            </p>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Pergunte sobre seus números</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Textarea
-              value={question}
-              maxLength={500}
-              rows={3}
-              placeholder="Quanto gastei com alimentação nos últimos três meses?"
-              onChange={(e) => setQuestion(e.target.value)}
-            />
-            <Button onClick={() => void submit()} disabled={pending}>
-              <Send className="mr-1.5 h-4 w-4" />
-              {pending ? "Analisando..." : "Perguntar"}
-            </Button>
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            {answer && (
-              <div className="whitespace-pre-wrap rounded-lg border border-border p-4 text-sm">
-                {answer}
+        {/* 3 INSIGHTS PRINCIPAIS ESTRUTURADOS */}
+        <div className="space-y-3">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <Lightbulb className="h-4 w-4 text-amber-500" /> Insights prioritários do momento
+          </h2>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            {topInsights.map((insight) => (
+              <Card key={insight.id} className="flex flex-col justify-between border-border/80 shadow-xs">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center gap-2 text-primary">
+                    <insight.icon className="h-4 w-4" />
+                    <span className="text-xs font-bold uppercase tracking-wider">O que aconteceu</span>
+                  </div>
+                  <CardTitle className="text-sm font-semibold mt-1">
+                    {insight.whatHappened}
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent className="space-y-3 pt-0 text-xs">
+                  <div>
+                    <span className="font-semibold text-foreground">Por que importa:</span>
+                    <p className="text-muted-foreground mt-0.5">{insight.whyItMatters}</p>
+                  </div>
+
+                  <div>
+                    <span className="font-semibold text-foreground">O que você pode fazer:</span>
+                    <p className="text-muted-foreground mt-0.5">{insight.whatToDo}</p>
+                  </div>
+
+                  {/* Ações clicáveis com navegação direta */}
+                  <div className="pt-2 border-t border-border flex flex-col gap-1.5">
+                    {insight.actions.map((act) => (
+                      <Button
+                        key={act.label}
+                        asChild
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 justify-between text-xs font-medium text-primary hover:text-primary hover:bg-primary/10 px-2"
+                      >
+                        <Link to={act.to}>
+                          <span>{act.label}</span>
+                          <ArrowRight className="h-3 w-3" />
+                        </Link>
+                      </Button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* SEÇÃO DE PERGUNTAS E RESPOSTAS COM CHIPS SUGERIDOS */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Caixa de Pergunta */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <MessageSquare className="h-4 w-4 text-primary" /> Faça uma pergunta ao Agente
+              </CardTitle>
+              <CardDescription className="text-xs">
+                O Agente consulta seus dados reais (sem exibir jargões técnicos) para tirar qualquer dúvida financeira.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Chips de Perguntas Sugeridas */}
+              <div className="space-y-1.5">
+                <span className="text-xs font-semibold text-muted-foreground">
+                  Perguntas sugeridas:
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {SUGGESTED_QUESTIONS.map((sug) => (
+                    <Button
+                      key={sug}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs rounded-full font-normal"
+                      onClick={() => handleSelectQuestion(sug)}
+                    >
+                      {sug}
+                    </Button>
+                  ))}
+                </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
+
+              <div className="space-y-2">
+                <Textarea
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  placeholder="Digite sua dúvida aqui... (ex: quanto posso gastar neste fim de semana?)"
+                  rows={3}
+                  className="resize-none text-sm"
+                />
+                {error && <p className="text-xs text-destructive">{error}</p>}
+                <Button
+                  onClick={() => handleAsk()}
+                  disabled={pending || question.trim().length < 3}
+                  className="w-full"
+                >
+                  <Send className="mr-1.5 h-4 w-4" />
+                  {pending ? "Analisando seus dados..." : "Consultar Agente"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Caixa de Resposta */}
+          <Card className="flex flex-col justify-between">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Bot className="h-4 w-4 text-primary" /> Resposta do Agente
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Explicações acolhedoras baseadas nas suas contas, cartões e movimentações.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1">
+              {answer ? (
+                <div className="rounded-xl border border-primary/20 bg-accent/30 p-4 text-sm leading-relaxed text-foreground whitespace-pre-line">
+                  {answer}
+                </div>
+              ) : (
+                <div className="flex h-48 flex-col items-center justify-center rounded-xl border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
+                  <Bot className="h-8 w-8 text-muted-foreground/50 mb-2" />
+                  Selecione uma das perguntas sugeridas ou digite sua dúvida ao lado para iniciar a conversa.
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </AppShell>
   );

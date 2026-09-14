@@ -30,7 +30,7 @@ import { cn } from "@/lib/utils";
 
 const NAV_GROUPS = [
   {
-    label: "Visão financeira",
+    label: "VISÃO FINANCEIRA",
     items: [
       { to: "/dashboard", label: "Visão geral", icon: LayoutDashboard },
       { to: "/movimentacoes", label: "Movimentações", icon: ArrowLeftRight },
@@ -39,28 +39,36 @@ const NAV_GROUPS = [
     ],
   },
   {
-    label: "Planejamento",
+    label: "PLANEJAMENTO",
     items: [
-      { to: "/orcamentos", label: "Orçamento", icon: PiggyBank },
+      { to: "/orcamentos", label: "Orçamentos", icon: PiggyBank },
       { to: "/metas", label: "Metas", icon: Target },
       { to: "/compromissos", label: "Contas futuras", icon: CalendarClock },
     ],
   },
   {
-    label: "Análises",
+    label: "ANÁLISES",
     items: [
       { to: "/relatorios", label: "Relatórios", icon: LineChart },
       { to: "/agente", label: "Agente Financeiro", icon: Sparkles },
     ],
   },
+  {
+    label: "MINHA CONTA",
+    items: [
+      { to: "/notificacoes", label: "Notificações", icon: Bell, badge: true },
+      { to: "/configuracoes", label: "Configurações", icon: Settings },
+      { to: "/perfil", label: "Perfil", icon: User },
+    ],
+  },
 ] as const;
 
 const MOBILE_NAV = [
-  { to: "/dashboard", label: "Visão", icon: LayoutDashboard },
-  { to: "/movimentacoes", label: "Lançar", icon: ArrowLeftRight },
+  { to: "/dashboard", label: "Início", icon: LayoutDashboard },
+  { to: "/movimentacoes", label: "Movimentações", icon: ArrowLeftRight },
   { to: "/cartoes", label: "Cartões", icon: CreditCard },
-  { to: "/orcamentos", label: "Orçamento", icon: PiggyBank },
-  { to: "/relatorios", label: "Relatórios", icon: LineChart },
+  { to: "/orcamentos", label: "Orçamentos", icon: PiggyBank },
+  { to: "/compromissos", label: "Contas futuras", icon: CalendarClock },
 ] as const;
 
 export function AppShell({
@@ -149,12 +157,13 @@ export function AppShell({
           {NAV_GROUPS.map((group) => (
             <div key={group.label} className="space-y-1">
               {!mini && (
-                <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-normal text-muted-foreground">
+                <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                   {group.label}
                 </p>
               )}
               {group.items.map((item) => {
                 const active = pathname.startsWith(item.to);
+                const hasBadge = "badge" in item && item.badge && unread > 0;
                 return (
                   <Link
                     key={item.to}
@@ -167,6 +176,11 @@ export function AppShell({
                       className={cn("h-4 w-4 shrink-0", active && "text-sidebar-primary")}
                     />
                     {!mini && <span className="truncate">{item.label}</span>}
+                    {!mini && hasBadge && (
+                      <span className="ml-auto rounded-full bg-sidebar-primary px-2 py-0.5 text-[11px] font-semibold text-sidebar-primary-foreground">
+                        {unread}
+                      </span>
+                    )}
                   </Link>
                 );
               })}
@@ -174,48 +188,19 @@ export function AppShell({
           ))}
         </nav>
 
-        <div className="space-y-1 border-t border-sidebar-border p-3">
-          <Link
-            to="/notificacoes"
-            title="Notificações"
-            onClick={() => setMenuOpen(false)}
-            className={linkClass(pathname.startsWith("/notificacoes"))}
-          >
-            <Bell className="h-4 w-4 shrink-0" />
-            {!mini && "Notificações"}
-            {!mini && unread > 0 && (
-              <span className="ml-auto rounded-full bg-sidebar-primary px-2 py-0.5 text-[11px] font-semibold text-sidebar-primary-foreground">
-                {unread}
-              </span>
-            )}
-          </Link>
-          <Link
-            to="/configuracoes"
-            title="Configurações"
-            onClick={() => setMenuOpen(false)}
-            className={linkClass(pathname.startsWith("/configuracoes"))}
-          >
-            <Settings className="h-4 w-4 shrink-0" />
-            {!mini && "Configurações"}
-          </Link>
-          <Link
-            to="/perfil"
-            title="Perfil"
-            onClick={() => setMenuOpen(false)}
-            className={linkClass(pathname.startsWith("/perfil"))}
-          >
-            <User className="h-4 w-4 shrink-0" />
-            {!mini && "Perfil"}
-          </Link>
+        <div className="border-t border-sidebar-border p-3">
           <Button
             type="button"
             variant="ghost"
             onClick={signOut}
-            title="Sair"
-            className={cn(linkClass(false), "h-auto w-full justify-start")}
+            title="Sair da conta"
+            className={cn(
+              linkClass(false),
+              "h-auto w-full justify-start text-muted-foreground hover:bg-destructive/10 hover:text-destructive",
+            )}
           >
             <LogOut className="h-4 w-4 shrink-0" />
-            {!mini && "Sair"}
+            {!mini && <span>Sair</span>}
           </Button>
         </div>
       </div>

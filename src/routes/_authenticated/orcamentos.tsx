@@ -1,12 +1,26 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { AlertTriangle, ChevronLeft, ChevronRight, Copy, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Copy,
+  Info,
+  Pencil,
+  PiggyBank,
+  Plus,
+  Trash2,
+  TrendingUp,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/app/AppShell";
 import { CurrencyInput } from "@/components/app/CurrencyInput";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +34,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -37,16 +52,27 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useFinance, useRefreshFinance } from "@/lib/data";
-import { budgetStatus, type Budget } from "@/lib/finance";
-import { formatBRL, formatMonthLabel, monthKeyToday, parseISODate } from "@/lib/format";
+import {
+  budgetStatus,
+  predictBudgetPacing,
+  type Budget,
+  type Category,
+} from "@/lib/finance";
+import { formatBRL, formatMonthLabel, monthKeyToday, parseISODate, toISODate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/orcamentos")({
   head: () => ({
     meta: [
       { title: "Orçamentos — Patrimo" },
-      { name: "description", content: "Limites por categoria com alertas em 90% e acima de 100%." },
+      {
+        name: "description",
+        content: "Defina limites mensais por categoria e receba alertas para evitar surpresas.",
+      },
       { property: "og:title", content: "Orçamentos — Patrimo" },
-      { property: "og:description", content: "Limites por categoria com alertas em 90% e acima de 100%." },
+      {
+        property: "og:description",
+        content: "Defina limites mensais por categoria e receba alertas para evitar surpresas.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -63,6 +89,7 @@ function shiftMonth(monthKey: string, delta: number): string {
 function Orcamentos() {
   const { data, isLoading } = useFinance();
   const refresh = useRefreshFinance();
+
   const [month, setMonth] = useState(() => monthKeyToday());
   const [open, setOpen] = useState(false);
   const [categoryId, setCategoryId] = useState("");
@@ -73,6 +100,7 @@ function Orcamentos() {
   const [editLimit, setEditLimit] = useState<number | null>(null);
   const [editError, setEditError] = useState<string | null>(null);
   const [removing, setRemoving] = useState<Budget | null>(null);
+  const [copyConfirmOpen, setCopyConfirmOpen] = useState(false);
 
   async function create() {
     if (!data) return;
@@ -91,11 +119,11 @@ function Orcamentos() {
       limit_amount: limit,
     });
     if (insertError) {
-      setError("Não foi possível salvar. Talvez já exista um orçamento para essa categoria.");
+      setError("Não foi possível salvar. Talvez já exista um orçamento para essa categoria neste mês.");
       return;
     }
     await refresh();
-    toast.success("Orçamento definido.");
+    toast.success("Orçamento definido com sucesso.");
     setCategoryId("");
     setLimit(null);
     setError(null);
@@ -117,7 +145,7 @@ function Orcamentos() {
       return;
     }
     await refresh();
-    toast.success("Limite atualizado.");
+    toast.success("Limite atualizado com sucesso.");
     setEditing(null);
     setEditError(null);
   }
@@ -126,7 +154,7 @@ function Orcamentos() {
     if (!removing) return;
     const { error: deleteError } = await supabase.from("budgets").delete().eq("id", removing.id);
     if (deleteError) {
-      toast.error("Não foi possível excluir.");
+      toast.error("Não foi possível excluir o orçamento.");
       return;
     }
     await refresh();
@@ -137,33 +165,41 @@ function Orcamentos() {
   async function copyPreviousMonth() {
     if (!data) return;
     const previous = shiftMonth(month, -1);
-    const source = data.budgets.filter((budget) => budget.month.startsWith(previous));
+    const source = data.budgets.filter((b) => b.month.startsWith(previous));
     if (source.length === 0) {
-      toast.info("Não há orçamentos no mês anterior para repetir.");
+      toast.info(`Nenhum orçamento encontrado em ${formatMonthLabel(parseISODate(`${previous}-01`))}.`);
+      setCopyConfirmOpen(false);
       return;
     }
-    const existing = new Set(
+
+    const currentCatIds = new Set(
       data.budgets.filter((b) => b.month.startsWith(month)).map((b) => b.category_id),
     );
-    const rows = source
-      .filter((budget) => !existing.has(budget.category_id))
-      .map((budget) => ({
+
+    const toInsert = source
+      .filter((b) => !currentCatIds.has(b.category_id))
+      .map((b) => ({
         user_id: data.userId,
-        category_id: budget.category_id,
+        category_id: b.category_id,
         month: `${month}-01`,
-        limit_amount: budget.limit_amount,
+        limit_amount: b.limit_amount,
       }));
-    if (rows.length === 0) {
-      toast.info("Todos os limites do mês anterior já existem aqui.");
+
+    if (toInsert.length === 0) {
+      toast.info("Todas as categorias do mês anterior já possuem orçamento definido neste mês.");
+      setCopyConfirmOpen(false);
       return;
     }
-    const { error: insertError } = await supabase.from("budgets").insert(rows);
+
+    const { error: insertError } = await supabase.from("budgets").insert(toInsert);
     if (insertError) {
-      toast.error("Não foi possível repetir os limites.");
+      toast.error("Não foi possível copiar os orçamentos.");
       return;
     }
+
     await refresh();
-    toast.success("Limites do mês anterior copiados.");
+    toast.success(`${toInsert.length} orçamentos copiados para ${formatMonthLabel(parseISODate(`${month}-01`))}.`);
+    setCopyConfirmOpen(false);
   }
 
   if (isLoading || !data) {
@@ -175,181 +211,454 @@ function Orcamentos() {
   }
 
   const statuses = budgetStatus(data.budgets, data.categories, data.transactions, month);
-  const usedCategories = new Set(
-    data.budgets.filter((b) => b.month.startsWith(month)).map((b) => b.category_id),
-  );
+
+  // Cálculos do resumo superior
+  const totalPlanned = statuses.reduce((sum, s) => sum + Number(s.budget.limit_amount), 0);
+  const totalSpent = statuses.reduce((sum, s) => sum + s.spent, 0);
+  const totalAvailable = Math.max(totalPlanned - totalSpent, 0);
+  const warningCount = statuses.filter((s) => s.level === "atencao").length;
+  const exceededCount = statuses.filter((s) => s.level === "excedido").length;
+
+  // Identificar gastos sem orçamento neste mês
+  const startISO = `${month}-01`;
+  const endISO = toISODate(new Date(parseISODate(startISO).getFullYear(), parseISODate(startISO).getMonth() + 1, 0));
+  const budgetedCategoryIds = new Set(statuses.map((s) => s.budget.category_id));
+
+  const expensesWithoutBudget = data.categories
+    .filter((cat) => cat.kind === "despesa" && !budgetedCategoryIds.has(cat.id))
+    .map((cat) => {
+      const spent = data.transactions
+        .filter(
+          (tx) =>
+            tx.kind === "despesa" &&
+            !tx.is_invoice_payment &&
+            tx.category_id === cat.id &&
+            tx.occurred_on >= startISO &&
+            tx.occurred_on <= endISO,
+        )
+        .reduce((sum, tx) => sum + Number(tx.amount), 0);
+      return { category: cat, spent };
+    })
+    .filter((item) => item.spent > 0)
+    .sort((a, b) => b.spent - a.spent);
+
+  const prevMonthLabel = formatMonthLabel(parseISODate(`${shiftMonth(month, -1)}-01`));
+  const currentMonthLabel = formatMonthLabel(parseISODate(`${month}-01`));
 
   return (
     <AppShell
       title="Orçamentos"
-      description="Limite de gasto por categoria, mês a mês"
+      description="Controle seus gastos planejados para evitar surpresas no fim do mês"
       actions={
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => void copyPreviousMonth()}>
-            <Copy className="mr-1.5 h-4 w-4" />
-            Repetir mês anterior
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setCopyConfirmOpen(true)}
+            title="Copiar limites do mês anterior"
+          >
+            <Copy className="mr-1.5 h-4 w-4" /> Repetir mês anterior
           </Button>
+
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button size="sm">
-                <Plus className="mr-1.5 h-4 w-4" />
-                Novo orçamento
+                <Plus className="mr-1.5 h-4 w-4" /> Definir orçamento
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>
-                  Novo orçamento — {formatMonthLabel(parseISODate(`${month}-01`))}
-                </DialogTitle>
+                <DialogTitle>Definir orçamento para {currentMonthLabel}</DialogTitle>
+                <DialogDescription>
+                  Estabeleça o teto que deseja gastar nesta categoria ao longo do mês.
+                </DialogDescription>
               </DialogHeader>
-              <div className="space-y-4">
+
+              <div className="space-y-4 py-2">
                 <div className="space-y-1.5">
                   <Label>Categoria</Label>
                   <Select value={categoryId} onValueChange={setCategoryId}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione" />
+                      <SelectValue placeholder="Selecione a categoria" />
                     </SelectTrigger>
                     <SelectContent>
                       {data.categories
-                        .filter(
-                          (category) =>
-                            category.kind === "despesa" && !usedCategories.has(category.id),
-                        )
-                        .map((category) => (
-                          <SelectItem key={category.id} value={category.id}>
-                            {category.name}
+                        .filter((c) => c.kind === "despesa")
+                        .map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.name}
                           </SelectItem>
                         ))}
                     </SelectContent>
                   </Select>
                 </div>
+
                 <div className="space-y-1.5">
-                  <Label>Limite do mês</Label>
-                  <CurrencyInput value={limit} onValueChange={setLimit} />
+                  <Label htmlFor="limit-amount">Limite mensal (R$)</Label>
+                  <CurrencyInput
+                    id="limit-amount"
+                    value={limit}
+                    onChange={setLimit}
+                    placeholder="0,00"
+                  />
                 </div>
-                {error && <p className="text-sm text-destructive">{error}</p>}
+
+                {error && (
+                  <p className="rounded-md bg-destructive/10 p-2 text-xs text-destructive">
+                    {error}
+                  </p>
+                )}
               </div>
-              <DialogFooter>
-                <Button onClick={() => void create()}>Salvar</Button>
+
+              <DialogFooter className="gap-2 sm:gap-0">
+                <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button type="button" onClick={() => void create()}>
+                  Salvar orçamento
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
         </div>
       }
     >
-      <div className="mb-5 flex items-center gap-3">
-        <Button
-          variant="outline"
-          size="icon"
-          aria-label="Mês anterior"
-          onClick={() => setMonth(shiftMonth(month, -1))}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <span className="font-display text-base font-semibold capitalize">
-          {formatMonthLabel(parseISODate(`${month}-01`))}
-        </span>
-        <Button
-          variant="outline"
-          size="icon"
-          aria-label="Mês seguinte"
-          onClick={() => setMonth(shiftMonth(month, 1))}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
+      <div className="space-y-6">
+        {/* NAVEGAÇÃO DE MÊS */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setMonth((m) => shiftMonth(m, -1))}
+              aria-label="Mês anterior"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="min-w-36 text-center text-base font-bold capitalize text-foreground">
+              {currentMonthLabel}
+            </span>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setMonth((m) => shiftMonth(m, 1))}
+              aria-label="Próximo mês"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
 
-      {statuses.length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center text-sm text-muted-foreground">
-            Nenhum orçamento definido para este mês.
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-6 lg:grid-cols-2">
-          {statuses.map((status) => (
-            <Card key={status.budget.id}>
-              <CardContent className="space-y-3 p-5">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium">{status.category?.name ?? "Categoria"}</span>
-                  <div className="flex items-center gap-1">
-                    {status.level !== "ok" && (
-                      <span
+        {/* RESUMO MENSAL NO TOPO */}
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="rounded-xl border border-border bg-card p-3 shadow-xs">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Total planejado
+            </span>
+            <p className="mt-1 text-xl font-bold tabular text-foreground">
+              {formatBRL(totalPlanned)}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-border bg-card p-3 shadow-xs">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Total gasto
+            </span>
+            <p className="mt-1 text-xl font-bold tabular text-foreground">
+              {formatBRL(totalSpent)}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-positive/30 bg-positive/5 p-3 shadow-xs">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Ainda disponível
+            </span>
+            <p className="mt-1 text-xl font-bold tabular text-positive">
+              {formatBRL(totalAvailable)}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 shadow-xs">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Em atenção
+            </span>
+            <p className="mt-1 text-xl font-bold tabular text-amber-600 dark:text-amber-400">
+              {warningCount} {warningCount === 1 ? "categoria" : "categorias"}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-3 shadow-xs">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Ultrapassaram
+            </span>
+            <p className="mt-1 text-xl font-bold tabular text-destructive">
+              {exceededCount} {exceededCount === 1 ? "categoria" : "categorias"}
+            </p>
+          </div>
+        </div>
+
+        {/* LISTA DE ORÇAMENTOS POR CATEGORIA */}
+        {statuses.length === 0 ? (
+          <Card>
+            <CardContent className="p-12 text-center text-sm text-muted-foreground">
+              Nenhum orçamento configurado para {currentMonthLabel}. Clique em "Definir orçamento" ou "Repetir mês anterior" para organizar seus limites.
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2">
+            {statuses.map(({ budget, category, spent, usage, level }) => {
+              const remaining = Math.max(Number(budget.limit_amount) - spent, 0);
+              const pacing = predictBudgetPacing(spent, Number(budget.limit_amount), month);
+
+              // Determinar status acolhedor
+              let stateBadge = {
+                label: "Tudo bem",
+                variant: "outline" as const,
+                className: "border-positive/40 bg-positive/10 text-positive",
+                icon: CheckCircle2,
+              };
+
+              if (spent === 0) {
+                stateBadge = {
+                  label: "Sem movimentações",
+                  variant: "outline" as const,
+                  className: "border-border text-muted-foreground",
+                  icon: Info,
+                };
+              } else if (level === "excedido") {
+                stateBadge = {
+                  label: "Limite ultrapassado",
+                  variant: "outline" as const,
+                  className: "border-destructive/40 bg-destructive/10 text-destructive",
+                  icon: AlertTriangle,
+                };
+              } else if (level === "atencao" || pacing.willExceed) {
+                stateBadge = {
+                  label: "Atenção",
+                  variant: "outline" as const,
+                  className: "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400",
+                  icon: AlertCircle,
+                };
+              }
+
+              return (
+                <Card key={budget.id} className="flex flex-col justify-between transition-shadow hover:shadow-md">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <CardTitle className="text-base font-bold">
+                            {category?.name ?? "Categoria"}
+                          </CardTitle>
+                          <Badge variant={stateBadge.variant} className={`text-xs gap-1 ${stateBadge.className}`}>
+                            <stateBadge.icon className="h-3 w-3" />
+                            {stateBadge.label}
+                          </Badge>
+                        </div>
+                        <CardDescription className="mt-0.5 text-xs">
+                          Limite mensal: <strong>{formatBRL(budget.limit_amount)}</strong>
+                        </CardDescription>
+                      </div>
+
+                      <div className="flex items-center gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                          title="Editar limite"
+                          onClick={() => {
+                            setEditing(budget);
+                            setEditLimit(Number(budget.limit_amount));
+                            setEditError(null);
+                          }}
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          title="Excluir orçamento"
+                          onClick={() => setRemoving(budget)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="space-y-4">
+                    {/* Indicadores de Gasto e Restante */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">
+                          Já gasto: <strong className="text-foreground tabular">{formatBRL(spent)}</strong> ({usage.toFixed(0)}%)
+                        </span>
+                        <span className="text-muted-foreground">
+                          Resta: <strong className={remaining === 0 ? "text-destructive" : "text-positive"}>{formatBRL(remaining)}</strong>
+                        </span>
+                      </div>
+
+                      <Progress
+                        value={Math.min(usage, 100)}
                         className={
-                          status.level === "excedido"
-                            ? "inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive"
-                            : "inline-flex items-center gap-1 rounded-full bg-warning/15 px-2 py-0.5 text-xs font-medium text-warning-foreground"
+                          level === "excedido"
+                            ? "[&>div]:bg-destructive"
+                            : level === "atencao"
+                              ? "[&>div]:bg-amber-500"
+                              : "[&>div]:bg-positive"
                         }
-                      >
-                        <AlertTriangle className="h-3 w-3" />
-                        {status.level === "excedido" ? "Limite excedido" : "Perto do limite"}
-                      </span>
-                    )}
+                      />
+                    </div>
+
+                    {/* Previsão no ritmo atual */}
+                    <div className="rounded-lg bg-accent/30 p-2.5 text-xs text-muted-foreground">
+                      {spent === 0 ? (
+                        <span>Nenhum gasto nesta categoria até o momento no mês.</span>
+                      ) : pacing.willExceed ? (
+                        <span className="text-amber-700 dark:text-amber-400 font-medium">
+                          Nesse ritmo, você pode passar {formatBRL(pacing.projectedExcess)} do limite até o fim do mês (previsão total de {formatBRL(pacing.projectedTotal)}).
+                        </span>
+                      ) : (
+                        <span>
+                          No ritmo atual, a estimativa até o fim do mês é de {formatBRL(pacing.projectedTotal)}, dentro do limite.
+                        </span>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ÁREA DE GASTOS SEM ORÇAMENTO */}
+        {expensesWithoutBudget.length > 0 && (
+          <Card className="border-border/80">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-sm font-bold flex items-center gap-2">
+                    <Info className="h-4 w-4 text-primary" /> Gastos sem orçamento definido
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    Categorias que tiveram saídas neste mês, mas ainda não possuem limite configurado.
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="divide-y divide-border">
+                {expensesWithoutBudget.map(({ category, spent }) => (
+                  <div
+                    key={category.id}
+                    className="flex items-center justify-between py-2.5 text-xs"
+                  >
+                    <div>
+                      <span className="font-semibold text-foreground">{category.name}</span>
+                      <p className="text-muted-foreground">Total gasto neste mês: {formatBRL(spent)}</p>
+                    </div>
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Editar limite"
+                      size="sm"
+                      variant="outline"
+                      className="text-xs h-7"
                       onClick={() => {
-                        setEditing(status.budget);
-                        setEditLimit(status.budget.limit_amount);
-                        setEditError(null);
+                        setCategoryId(category.id);
+                        setLimit(Math.ceil(spent * 1.15)); // Sugestão 15% acima do atual
+                        setOpen(true);
                       }}
                     >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Remover orçamento"
-                      onClick={() => setRemoving(status.budget)}
-                    >
-                      <Trash2 className="h-4 w-4" />
+                      <Plus className="mr-1 h-3 w-3" /> Definir limite
                     </Button>
                   </div>
-                </div>
-                <Progress value={Math.min(status.usage, 100)} />
-                <div className="flex justify-between text-sm">
-                  <span className="tabular">{formatBRL(status.spent)}</span>
-                  <span className="tabular text-muted-foreground">
-                    de {formatBRL(status.budget.limit_amount)} ({status.usage.toFixed(0)}%)
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
-      <Dialog open={Boolean(editing)} onOpenChange={(value) => !value && setEditing(null)}>
+      {/* MODAL EXPLICATIVO PARA REPETIR MÊS ANTERIOR */}
+      <AlertDialog open={copyConfirmOpen} onOpenChange={setCopyConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Copy className="h-5 w-5 text-primary" /> Repetir orçamentos do mês anterior?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-left space-y-2">
+              <p>
+                Vamos copiar os limites configurados em <strong>{prevMonthLabel}</strong> para <strong>{currentMonthLabel}</strong>.
+              </p>
+              <p>
+                Você poderá editar ou remover qualquer valor individualmente depois que forem copiados.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setCopyConfirmOpen(false)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => void copyPreviousMonth()}>
+              Confirmar e copiar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* MODAL DE EDIÇÃO DE LIMITE */}
+      <Dialog open={editing !== null} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Editar limite</DialogTitle>
+            <DialogTitle>Editar limite do orçamento</DialogTitle>
+            <DialogDescription>Ajuste o teto mensal para esta categoria.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-1.5">
-              <Label>Novo limite do mês</Label>
-              <CurrencyInput value={editLimit} onValueChange={setEditLimit} />
+
+          {editing && (
+            <div className="space-y-4 py-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-limit-amount">Novo limite mensal (R$)</Label>
+                <CurrencyInput
+                  id="edit-limit-amount"
+                  value={editLimit}
+                  onChange={setEditLimit}
+                />
+              </div>
+
+              {editError && (
+                <p className="rounded-md bg-destructive/10 p-2 text-xs text-destructive">
+                  {editError}
+                </p>
+              )}
             </div>
-            {editError && <p className="text-sm text-destructive">{editError}</p>}
-          </div>
-          <DialogFooter>
-            <Button onClick={() => void saveEdit()}>Salvar</Button>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button type="button" variant="outline" onClick={() => setEditing(null)}>
+              Cancelar
+            </Button>
+            <Button type="button" onClick={() => void saveEdit()}>
+              Salvar alterações
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={Boolean(removing)} onOpenChange={(value) => !value && setRemoving(null)}>
+      {/* MODAL DE EXCLUSÃO */}
+      <AlertDialog open={removing !== null} onOpenChange={(o) => !o && setRemoving(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remover este orçamento?</AlertDialogTitle>
+            <AlertDialogTitle>Remover orçamento?</AlertDialogTitle>
             <AlertDialogDescription>
-              O limite deste mês deixa de existir e os alertas param. Seus gastos continuam
-              registrados.
+              Esta categoria deixará de ter um teto de gastos para o mês selecionado. Nenhum lançamento ou dado financeiro será apagado.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => void remove()}>Remover</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setRemoving(null)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => void remove()}>
+              Remover orçamento
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

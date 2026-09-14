@@ -494,3 +494,177 @@ export function futureCommitments(commitments: Commitment[], from: Date = new Da
     }))
     .sort((a, b) => a.month.localeCompare(b.month));
 }
+
+/* --------------------------------------------------- novas métricas acolhedoras */
+
+/** Calcula o saldo comprometido e o saldo disponível de verdade para uma conta */
+export function accountAvailability(
+  account: Account,
+  transactions: Transaction[],
+  commitments: Commitment[],
+  cards: CreditCard[],
+  withinDays: number = 30,
+): { currentBalance: number; committedAmount: number; availableBalance: number } {
+  const currentBalance = accountBalance(account, transactions);
+  const now = new Date();
+  const limitDate = new Date();
+  limitDate.setDate(limitDate.getDate() + withinDays);
+  const limitISO = toISODate(limitDate);
+  const todayISO = toISODate(now);
+
+  // Compromissos pendentes vinculados a esta conta nos próximos dias
+  const pendingCommitments = commitments
+    .filter(
+      (c) =>
+        c.status === "pendente" &&
+        c.kind === "despesa" &&
+        c.account_id === account.id &&
+        c.due_date >= todayISO &&
+        c.due_date <= limitISO,
+    )
+    .reduce((sum, c) => sum + Number(c.amount), 0);
+
+  // Faturas de cartões debitadas nesta conta
+  const linkedCardIds = new Set(
+    cards.filter((c) => !c.archived && c.payment_account_id === account.id).map((c) => c.id),
+  );
+  let cardPending = 0;
+  for (const card of cards) {
+    if (linkedCardIds.has(card.id)) {
+      cardPending += cardOpenInvoiceTotal(card, transactions);
+    }
+  }
+
+  const committedAmount = pendingCommitments + cardPending;
+  const availableBalance = currentBalance - committedAmount;
+
+  return {
+    currentBalance,
+    committedAmount,
+    availableBalance,
+  };
+}
+
+/** Previsão de orçamento até o final do mês no ritmo atual */
+export function predictBudgetPacing(spent: number, limit: number, monthKeyStr: string) {
+  const now = new Date();
+  const todayMonthKey = toISODate(now).slice(0, 7);
+  const isCurrentMonth = monthKeyStr === todayMonthKey;
+
+  const monthDate = parseISODate(`${monthKeyStr}-01`);
+  const daysInMonth = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0).getDate();
+  const currentDay = isCurrentMonth ? Math.max(now.getDate(), 1) : daysInMonth;
+
+  const usagePercent = limit > 0 ? (spent / limit) * 100 : 0;
+  const dailyAverage = spent / currentDay;
+  const projectedTotal = dailyAverage * daysInMonth;
+  const projectedExcess = Math.max(projectedTotal - limit, 0);
+
+  return {
+    usagePercent,
+    currentDay,
+    daysInMonth,
+    projectedTotal,
+    projectedExcess,
+    willExceed: projectedExcess > 0,
+  };
+}
+
+/** Status e ritmo de uma meta */
+export function goalPacing(goal: Goal): {
+  target: number;
+  current: number;
+  missing: number;
+  percentage: number;
+  monthlyNeeded: number;
+  monthsLeft: number;
+  status: "no_ritmo" | "atencao" | "atrasada";
+  statusLabel: string;
+} {
+  const target = Number(goal.target_amount);
+  const current = Number(goal.current_amount);
+  const missing = Math.max(target - current, 0);
+  const percentage = target > 0 ? Math.min((current / target) * 100, 100) : 0;
+  const monthsLeft = monthsUntil(goal.target_date);
+  const monthlyNeeded = missing / monthsLeft;
+
+  // Avaliação do ritmo
+  let status: "no_ritmo" | "atencao" | "atrasada" = "no_ritmo";
+  let statusLabel = "No ritmo";
+
+  if (percentage >= 100) {
+    status = "no_ritmo";
+    statusLabel = "Concluída";
+  } else if (monthsLeft <= 2 && percentage < 50) {
+    status = "atrasada";
+    statusLabel = "Atrasada";
+  } else if (percentage < 30 && monthsLeft <= 4) {
+    status = "atencao";
+    statusLabel = "Atenção";
+  }
+
+  return {
+    target,
+    current,
+    missing,
+    percentage,
+    monthlyNeeded,
+    monthsLeft,
+    status,
+    statusLabel,
+  };
+}
+
+/** Identifica gastos fora do comum no período (sem transferências) */
+export function detectUnusualExpenses(
+  transactions: Transaction[],
+  categories: Category[],
+  start: string,
+  end: string,
+): {
+  transaction: Transaction;
+  categoryName: string;
+  categoryColor: string;
+  categoryTotal: number;
+  differenceFactor: number;
+}[] {
+  const expenses = transactions.filter(
+    (tx) =>
+      tx.kind === "despesa" &&
+      !tx.is_invoice_payment &&
+      tx.occurred_on >= start &&
+      tx.occurred_on <= end,
+  );
+
+  if (expenses.length < 3) return [];
+
+  const avg = expenses.reduce((s, tx) => s + Number(tx.amount), 0) / expenses.length;
+  const out: {
+    transaction: Transaction;
+    categoryName: string;
+    categoryColor: string;
+    categoryTotal: number;
+    differenceFactor: number;
+  }[] = [];
+
+  for (const tx of expenses) {
+    const val = Number(tx.amount);
+    // Gasto considerável e pelo menos 2.5x acima da média das despesas
+    if (val > 200 && val >= avg * 2.2) {
+      const cat = categories.find((c) => c.id === tx.category_id);
+      const catExpenses = expenses.filter((e) => e.category_id === tx.category_id);
+      const catTotal = catExpenses.reduce((s, e) => s + Number(e.amount), 0);
+
+      out.push({
+        transaction: tx,
+        categoryName: cat?.name ?? "Geral",
+        categoryColor: cat?.color ?? "#f59e0b",
+        categoryTotal: catTotal,
+        differenceFactor: Math.round(val / avg),
+      });
+    }
+  }
+
+  return out.slice(0, 2); // No máximo 2 alertas pontuais para não poluir
+}
+
