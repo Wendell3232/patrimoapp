@@ -2,33 +2,27 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  AlertCircle,
   ArrowRight,
   Bot,
   CalendarClock,
-  CheckCircle2,
-  CreditCard,
-  HelpCircle,
   Lightbulb,
+  Loader2,
   MessageSquare,
   PiggyBank,
   Send,
   Sparkles,
   Target,
-  Wallet,
 } from "lucide-react";
 
 import { AppShell } from "@/components/app/AppShell";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { analyzeFinanceQuery } from "@/lib/agent-engine";
 import { askAgent } from "@/lib/agent.functions";
 import { useFinance } from "@/lib/data";
 import {
-  budgetStatus,
-  cardUsedLimit,
   expensesByCategory,
   futureCommitments,
   goalPacing,
@@ -74,17 +68,16 @@ const SUGGESTED_QUESTIONS = [
   "Como está o uso dos meus cartões de crédito?",
 ];
 
-import { analyzeFinanceQuery } from "@/lib/agent-engine";
-
+/** Renderiza a resposta do agente com suporte a negrito (**texto**) e bullet points. */
 function FormattedAgentAnswer({ content }: { content: string }) {
   const lines = content.split("\n");
   return (
-    <div className="space-y-2 text-sm leading-relaxed text-foreground">
+    <div className="space-y-1.5 text-sm leading-relaxed text-foreground">
       {lines.map((line, idx) => {
-        if (!line.trim()) return <div key={idx} className="h-1.5" />;
+        if (!line.trim()) return <div key={idx} className="h-1" />;
         const parts = line.split(/(\*\*[^*]+\*\*)/g);
         return (
-          <p key={idx} className={line.startsWith("•") ? "pl-2" : ""}>
+          <p key={idx} className={line.startsWith("•") || line.startsWith("-") ? "pl-2" : ""}>
             {parts.map((part, pIdx) => {
               if (part.startsWith("**") && part.endsWith("**")) {
                 return (
@@ -105,10 +98,10 @@ function FormattedAgentAnswer({ content }: { content: string }) {
 function Agente() {
   const { data, isLoading } = useFinance();
   const navigate = useNavigate();
+  // ask é usado apenas como fallback quando data não estiver disponível no cliente
   const ask = useServerFn(askAgent);
 
   const [question, setQuestion] = useState("");
-  const [lastAskedQuestion, setLastAskedQuestion] = useState<string | null>(null);
   const [answer, setAnswer] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -178,7 +171,6 @@ function Agente() {
       });
     }
 
-    // Limitar rigorosamente a no máximo 3 insights principais
     return {
       monthSummary,
       topInsights: insights.slice(0, 3),
@@ -193,19 +185,17 @@ function Agente() {
     }
     setPending(true);
     setError(null);
-    setLastAskedQuestion(q);
 
     try {
-      // Simulação rápida para UX fluida e agradável
-      await new Promise((resolve) => setTimeout(resolve, 450));
-
+      // Motor analítico direto no cliente (usa os dados já carregados — sem latência de rede)
       if (data) {
-        const directAnswer = analyzeFinanceQuery(q, data);
-        setAnswer(directAnswer);
+        // Pequeno delay para UX fluida
+        await new Promise((resolve) => setTimeout(resolve, 380));
+        setAnswer(analyzeFinanceQuery(q, data));
         return;
       }
 
-      // Fallback
+      // Fallback via server function quando os dados do cliente não estão disponíveis
       const result = await ask({ data: { question: q } });
       setAnswer(result.answer);
     } catch {
@@ -227,7 +217,15 @@ function Agente() {
   if (isLoading || !data) {
     return (
       <AppShell title="Agente Financeiro">
-        <Skeleton className="h-64 w-full rounded-xl" />
+        <div className="space-y-4">
+          <Skeleton className="h-20 w-full rounded-xl" />
+          <div className="grid gap-4 md:grid-cols-3">
+            <Skeleton className="h-40 rounded-xl" />
+            <Skeleton className="h-40 rounded-xl" />
+            <Skeleton className="h-40 rounded-xl" />
+          </div>
+          <Skeleton className="h-64 w-full rounded-xl" />
+        </div>
       </AppShell>
     );
   }
@@ -238,7 +236,7 @@ function Agente() {
       description="Assistente inteligente com explicações acolhedoras sobre os seus números"
     >
       <div className="space-y-6">
-        {/* RESUMO SIMPLES NO TOPO */}
+        {/* RESUMO RÁPIDO DO MÊS */}
         <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
           <Sparkles className="h-5 w-5 shrink-0 text-primary" />
           <div>
@@ -246,65 +244,66 @@ function Agente() {
               Visão rápida do mês
             </span>
             <p className="mt-0.5 font-bold text-base text-foreground sm:text-lg">
-              {monthSummary}
+              {monthSummary || "Nenhum lançamento registrado neste mês ainda."}
             </p>
           </div>
         </div>
 
-        {/* 3 INSIGHTS PRINCIPAIS ESTRUTURADOS */}
-        <div className="space-y-3">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <Lightbulb className="h-4 w-4 text-amber-500" /> Insights prioritários do momento
-          </h2>
+        {/* 3 INSIGHTS ESTRUTURADOS */}
+        {topInsights.length > 0 && (
+          <div className="space-y-3">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <Lightbulb className="h-4 w-4 text-amber-500" /> Insights prioritários do momento
+            </h2>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            {topInsights.map((insight) => (
-              <Card key={insight.id} className="flex flex-col justify-between border-border/80 shadow-xs">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center gap-2 text-primary">
-                    <insight.icon className="h-4 w-4" />
-                    <span className="text-xs font-bold uppercase tracking-wider">O que aconteceu</span>
-                  </div>
-                  <CardTitle className="text-sm font-semibold mt-1">
-                    {insight.whatHappened}
-                  </CardTitle>
-                </CardHeader>
+            <div className="grid gap-4 md:grid-cols-3">
+              {topInsights.map((insight) => (
+                <Card key={insight.id} className="flex flex-col justify-between border-border/80 shadow-xs">
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center gap-2 text-primary">
+                      <insight.icon className="h-4 w-4" />
+                      <span className="text-xs font-bold uppercase tracking-wider">O que aconteceu</span>
+                    </div>
+                    <CardTitle className="text-sm font-semibold mt-1">
+                      {insight.whatHappened}
+                    </CardTitle>
+                  </CardHeader>
 
-                <CardContent className="space-y-3 pt-0 text-xs">
-                  <div>
-                    <span className="font-semibold text-foreground">Por que importa:</span>
-                    <p className="text-muted-foreground mt-0.5">{insight.whyItMatters}</p>
-                  </div>
+                  <CardContent className="space-y-3 pt-0 text-xs">
+                    <div>
+                      <span className="font-semibold text-foreground">Por que importa:</span>
+                      <p className="text-muted-foreground mt-0.5">{insight.whyItMatters}</p>
+                    </div>
 
-                  <div>
-                    <span className="font-semibold text-foreground">O que você pode fazer:</span>
-                    <p className="text-muted-foreground mt-0.5">{insight.whatToDo}</p>
-                  </div>
+                    <div>
+                      <span className="font-semibold text-foreground">O que você pode fazer:</span>
+                      <p className="text-muted-foreground mt-0.5">{insight.whatToDo}</p>
+                    </div>
 
-                  {/* Ações clicáveis com navegação direta */}
-                  <div className="pt-2 border-t border-border flex flex-col gap-1.5">
-                    {insight.actions.map((act) => (
-                      <Button
-                        key={act.label}
-                        asChild
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 justify-between text-xs font-medium text-primary hover:text-primary hover:bg-primary/10 px-2"
-                      >
-                        <Link to={act.to}>
-                          <span>{act.label}</span>
-                          <ArrowRight className="h-3 w-3" />
-                        </Link>
-                      </Button>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    <div className="pt-2 border-t border-border flex flex-col gap-1.5">
+                      {insight.actions.map((act) => (
+                        <Button
+                          key={act.label}
+                          asChild
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 justify-between text-xs font-medium text-primary hover:text-primary hover:bg-primary/10 px-2"
+                        >
+                          <Link to={act.to}>
+                            <span>{act.label}</span>
+                            <ArrowRight className="h-3 w-3" />
+                          </Link>
+                        </Button>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* SEÇÃO DE PERGUNTAS E RESPOSTAS COM CHIPS SUGERIDOS */}
+        {/* PERGUNTAS E RESPOSTAS */}
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Caixa de Pergunta */}
           <Card>
@@ -313,15 +312,13 @@ function Agente() {
                 <MessageSquare className="h-4 w-4 text-primary" /> Faça uma pergunta ao Agente
               </CardTitle>
               <CardDescription className="text-xs">
-                O Agente consulta seus dados reais (sem exibir jargões técnicos) para tirar qualquer dúvida financeira.
+                O Agente analisa seus dados reais e responde em linguagem simples, sem jargões técnicos.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Chips de Perguntas Sugeridas */}
+              {/* Chips de perguntas sugeridas */}
               <div className="space-y-1.5">
-                <span className="text-xs font-semibold text-muted-foreground">
-                  Perguntas sugeridas:
-                </span>
+                <span className="text-xs font-semibold text-muted-foreground">Perguntas sugeridas:</span>
                 <div className="flex flex-wrap gap-1.5">
                   {SUGGESTED_QUESTIONS.map((sug) => (
                     <Button
@@ -331,6 +328,7 @@ function Agente() {
                       size="sm"
                       className="h-7 text-xs rounded-full font-normal"
                       onClick={() => handleSelectQuestion(sug)}
+                      disabled={pending}
                     >
                       {sug}
                     </Button>
@@ -342,42 +340,66 @@ function Agente() {
                 <Textarea
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
-                  placeholder="Digite sua dúvida aqui... (ex: quanto posso gastar neste fim de semana?)"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                      e.preventDefault();
+                      void handleAsk();
+                    }
+                  }}
+                  placeholder="Digite sua dúvida... (ex: quanto posso gastar neste fim de semana?)"
                   rows={3}
                   className="resize-none text-sm"
+                  maxLength={500}
                 />
                 {error && <p className="text-xs text-destructive">{error}</p>}
                 <Button
-                  onClick={() => handleAsk()}
+                  onClick={() => void handleAsk()}
                   disabled={pending || question.trim().length < 3}
                   className="w-full"
                 >
-                  <Send className="mr-1.5 h-4 w-4" />
-                  {pending ? "Analisando seus dados..." : "Consultar Agente"}
+                  {pending ? (
+                    <>
+                      <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                      Analisando seus dados...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-1.5 h-4 w-4" />
+                      Consultar Agente
+                    </>
+                  )}
                 </Button>
+                <p className="text-center text-[10px] text-muted-foreground">
+                  Ctrl+Enter para enviar · O agente usa somente os seus dados cadastrados
+                </p>
               </div>
             </CardContent>
           </Card>
 
           {/* Caixa de Resposta */}
-          <Card className="flex flex-col justify-between">
+          <Card className="flex flex-col">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Bot className="h-4 w-4 text-primary" /> Resposta do Agente
               </CardTitle>
               <CardDescription className="text-xs">
-                Explicações acolhedoras baseadas nas suas contas, cartões e movimentações.
+                Explicações acolhedoras baseadas nas suas contas, cartões e movimentações reais.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
-              {answer ? (
-                <div className="rounded-xl border border-primary/20 bg-accent/30 p-4 text-sm leading-relaxed text-foreground whitespace-pre-line">
-                  {answer}
+              {pending ? (
+                <div className="flex h-48 flex-col items-center justify-center gap-3 text-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary/60" />
+                  <p className="text-xs text-muted-foreground">Analisando seus dados financeiros...</p>
+                </div>
+              ) : answer ? (
+                <div className="rounded-xl border border-primary/20 bg-accent/30 p-4">
+                  <FormattedAgentAnswer content={answer} />
                 </div>
               ) : (
                 <div className="flex h-48 flex-col items-center justify-center rounded-xl border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
                   <Bot className="h-8 w-8 text-muted-foreground/50 mb-2" />
-                  Selecione uma das perguntas sugeridas ou digite sua dúvida ao lado para iniciar a conversa.
+                  Selecione uma das perguntas sugeridas ou escreva sua dúvida ao lado para iniciar a conversa.
                 </div>
               )}
             </CardContent>

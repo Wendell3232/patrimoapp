@@ -12,10 +12,50 @@ export const askAgent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => askSchema.parse(data))
   .handler(async ({ data, context }) => {
+    // Busca todos os dados do Supabase com campos completos para o motor interno
+    const [accounts, cards, categories, transactions, commitments, goals, budgets] =
+      await Promise.all([
+        context.supabase
+          .from("accounts")
+          .select("id,name,type,opening_balance,institution,color,archived"),
+        context.supabase
+          .from("credit_cards")
+          .select("id,name,brand,limit_amount,closing_day,due_day,payment_account_id,color,archived"),
+        context.supabase.from("categories").select("id,name,kind,color,icon"),
+        context.supabase
+          .from("transactions")
+          .select(
+            "id,kind,amount,occurred_on,description,notes,category_id,account_id,to_account_id,credit_card_id,installment_group,installment_number,installment_total,is_invoice_payment,paid",
+          )
+          .order("occurred_on", { ascending: false })
+          .limit(500),
+        context.supabase
+          .from("commitments")
+          .select(
+            "id,description,amount,due_date,kind,status,category_id,account_id,credit_card_id,transaction_id",
+          ),
+        context.supabase
+          .from("goals")
+          .select("id,name,target_amount,current_amount,target_date,account_id"),
+        context.supabase.from("budgets").select("id,category_id,month,limit_amount"),
+      ]);
+
+    // Tenta usar a IA da Lovable como primeiro respondedor (se a chave estiver disponível)
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (apiKey) {
       try {
-        const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        const snapshot = {
+          contas: accounts.data ?? [],
+          cartoes: cards.data ?? [],
+          categorias: categories.data ?? [],
+          lancamentos: transactions.data ?? [],
+          compromissos: commitments.data ?? [],
+          metas: goals.data ?? [],
+          orcamentos: budgets.data ?? [],
+          hoje: new Date().toISOString().slice(0, 10),
+        };
+
+        const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${apiKey}`,
@@ -33,7 +73,7 @@ export const askAgent = createServerFn({ method: "POST" })
                   "Use somente os dados fornecidos. Regras: patrimônio é a soma dos saldos das contas e " +
                   "acumula entre meses; transferências entre contas não são receita nem despesa; " +
                   "limite de cartão não é patrimônio; compra no cartão entra na fatura e só debita a conta " +
-                  "quando a fatura é paga.",
+                  "quando a fatura é paga. Se um dado não existir, diga isso em vez de estimar.",
               },
               {
                 role: "user",
@@ -43,8 +83,8 @@ export const askAgent = createServerFn({ method: "POST" })
           }),
         });
 
-        if (response.ok) {
-          const payload = (await response.json()) as {
+        if (aiResponse.ok) {
+          const payload = (await aiResponse.json()) as {
             choices?: { message?: { content?: string } }[];
           };
           const content = payload.choices?.[0]?.message?.content;
@@ -57,79 +97,80 @@ export const askAgent = createServerFn({ method: "POST" })
       }
     }
 
-    // Fallback inteligente com o motor analítico interno do Patrimo
+    // Motor analítico interno do Patrimo — funciona 100% offline, sem chave externa
     const { analyzeFinanceQuery } = await import("./agent-engine");
+
     const financeData = {
       userId: context.userId,
       profile: null,
-      accounts: (accounts.data ?? []).map((a, i) => ({
-        id: `acc-${i}`,
-        name: a.name,
-        type: a.type,
-        institution: null,
+      accounts: (accounts.data ?? []).map((a) => ({
+        id: a.id ?? "",
+        name: a.name ?? "",
+        type: (a.type ?? "corrente") as "corrente" | "poupanca" | "dinheiro" | "investimentos",
+        institution: a.institution ?? null,
         opening_balance: Number(a.opening_balance ?? 0),
-        color: "#3b82f6",
-        archived: false,
+        color: a.color ?? "#3b82f6",
+        archived: Boolean(a.archived),
       })),
-      cards: (cards.data ?? []).map((c, i) => ({
-        id: `card-${i}`,
-        name: c.name,
-        brand: null,
+      cards: (cards.data ?? []).map((c) => ({
+        id: c.id ?? "",
+        name: c.name ?? "",
+        brand: c.brand ?? null,
         limit_amount: Number(c.limit_amount ?? 0),
         closing_day: Number(c.closing_day ?? 28),
         due_day: Number(c.due_day ?? 5),
-        payment_account_id: null,
-        color: "#8b5cf6",
-        archived: false,
+        payment_account_id: c.payment_account_id ?? null,
+        color: c.color ?? "#8b5cf6",
+        archived: Boolean(c.archived),
       })),
       categories: (categories.data ?? []).map((cat) => ({
-        id: cat.id,
-        name: cat.name,
-        kind: cat.kind,
-        color: "#64748b",
-        icon: "tag",
+        id: cat.id ?? "",
+        name: cat.name ?? "",
+        kind: (cat.kind ?? "despesa") as "receita" | "despesa",
+        color: cat.color ?? "#64748b",
+        icon: cat.icon ?? "tag",
       })),
-      transactions: (transactions.data ?? []).map((t, i) => ({
-        id: `tx-${i}`,
-        kind: t.kind,
+      transactions: (transactions.data ?? []).map((t) => ({
+        id: t.id ?? "",
+        kind: (t.kind ?? "despesa") as "receita" | "despesa" | "transferencia",
         amount: Number(t.amount ?? 0),
-        occurred_on: t.occurred_on,
-        description: t.description,
-        notes: null,
-        category_id: t.category_id,
-        account_id: null,
-        to_account_id: null,
-        credit_card_id: t.credit_card_id,
-        installment_group: null,
-        installment_number: null,
-        installment_total: null,
-        is_invoice_payment: false,
-        paid: true,
+        occurred_on: t.occurred_on ?? "",
+        description: t.description ?? "",
+        notes: t.notes ?? null,
+        category_id: t.category_id ?? null,
+        account_id: t.account_id ?? null,
+        to_account_id: t.to_account_id ?? null,
+        credit_card_id: t.credit_card_id ?? null,
+        installment_group: t.installment_group ?? null,
+        installment_number: t.installment_number ?? null,
+        installment_total: t.installment_total ?? null,
+        is_invoice_payment: Boolean(t.is_invoice_payment),
+        paid: Boolean(t.paid),
       })),
-      commitments: (commitments.data ?? []).map((com, i) => ({
-        id: `com-${i}`,
-        description: com.description,
+      commitments: (commitments.data ?? []).map((com) => ({
+        id: com.id ?? "",
+        description: com.description ?? "",
         amount: Number(com.amount ?? 0),
-        due_date: com.due_date,
-        kind: com.kind,
-        status: com.status,
-        category_id: null,
-        account_id: null,
-        credit_card_id: null,
-        transaction_id: null,
+        due_date: com.due_date ?? "",
+        kind: (com.kind ?? "despesa") as "receita" | "despesa",
+        status: (com.status ?? "pendente") as "pendente" | "pago",
+        category_id: com.category_id ?? null,
+        account_id: com.account_id ?? null,
+        credit_card_id: com.credit_card_id ?? null,
+        transaction_id: com.transaction_id ?? null,
       })),
-      goals: (goals.data ?? []).map((g, i) => ({
-        id: `goal-${i}`,
-        name: g.name,
+      goals: (goals.data ?? []).map((g) => ({
+        id: g.id ?? "",
+        name: g.name ?? "",
         target_amount: Number(g.target_amount ?? 0),
         current_amount: Number(g.current_amount ?? 0),
-        target_date: g.target_date,
-        account_id: null,
+        target_date: g.target_date ?? "",
+        account_id: g.account_id ?? null,
       })),
-      budgets: (budgets.data ?? []).map((b, i) => ({
-        id: `budget-${i}`,
-        category_id: b.category_id,
-        month: b.month,
+      budgets: (budgets.data ?? []).map((b) => ({
+        id: b.id ?? "",
+        category_id: b.category_id ?? "",
+        month: b.month ?? "",
         limit_amount: Number(b.limit_amount ?? 0),
       })),
       notifications: [],
