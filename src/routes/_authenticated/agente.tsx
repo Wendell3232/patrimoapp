@@ -74,12 +74,41 @@ const SUGGESTED_QUESTIONS = [
   "Como está o uso dos meus cartões de crédito?",
 ];
 
+import { analyzeFinanceQuery } from "@/lib/agent-engine";
+
+function FormattedAgentAnswer({ content }: { content: string }) {
+  const lines = content.split("\n");
+  return (
+    <div className="space-y-2 text-sm leading-relaxed text-foreground">
+      {lines.map((line, idx) => {
+        if (!line.trim()) return <div key={idx} className="h-1.5" />;
+        const parts = line.split(/(\*\*[^*]+\*\*)/g);
+        return (
+          <p key={idx} className={line.startsWith("•") ? "pl-2" : ""}>
+            {parts.map((part, pIdx) => {
+              if (part.startsWith("**") && part.endsWith("**")) {
+                return (
+                  <strong key={pIdx} className="font-semibold text-foreground">
+                    {part.slice(2, -2)}
+                  </strong>
+                );
+              }
+              return <span key={pIdx}>{part}</span>;
+            })}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
 function Agente() {
   const { data, isLoading } = useFinance();
   const navigate = useNavigate();
   const ask = useServerFn(askAgent);
 
   const [question, setQuestion] = useState("");
+  const [lastAskedQuestion, setLastAskedQuestion] = useState<string | null>(null);
   const [answer, setAnswer] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -164,11 +193,27 @@ function Agente() {
     }
     setPending(true);
     setError(null);
+    setLastAskedQuestion(q);
+
     try {
+      // Simulação rápida para UX fluida e agradável
+      await new Promise((resolve) => setTimeout(resolve, 450));
+
+      if (data) {
+        const directAnswer = analyzeFinanceQuery(q, data);
+        setAnswer(directAnswer);
+        return;
+      }
+
+      // Fallback
       const result = await ask({ data: { question: q } });
       setAnswer(result.answer);
     } catch {
-      setError("Não consegui analisar agora. Tente novamente em instantes.");
+      if (data) {
+        setAnswer(analyzeFinanceQuery(q, data));
+      } else {
+        setError("Não consegui analisar agora. Tente novamente em instantes.");
+      }
     } finally {
       setPending(false);
     }
