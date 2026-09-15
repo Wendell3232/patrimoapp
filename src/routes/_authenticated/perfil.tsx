@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Calendar, Lock, Mail, User as UserIcon } from "lucide-react";
+import { Calendar, Lock, User as UserIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/app/AppShell";
@@ -68,7 +68,6 @@ function Perfil() {
   }
 
   const profile = data.profile;
-  const isGoogle = profile?.email?.endsWith("@gmail.com");
 
   return (
     <AppShell title="Perfil" description="Seus dados e acesso">
@@ -94,15 +93,9 @@ function Perfil() {
             <div className="space-y-1.5">
               <Label htmlFor="email">E-mail</Label>
               <Input id="email" value={profile?.email ?? ""} disabled className="bg-accent/30" />
-              {isGoogle ? (
-                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                  <Mail className="h-3 w-3" /> Vem da sua conta Google e não pode ser alterado.
-                </p>
-              ) : (
-                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                  <Lock className="h-3 w-3" /> Vinculado com segurança à sua conta.
-                </p>
-              )}
+              <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                <Lock className="h-3 w-3" /> Vinculado com segurança à sua conta.
+              </p>
             </div>
 
             <Button onClick={() => void save()} disabled={saving} size="sm">
@@ -120,9 +113,7 @@ function Perfil() {
           <CardContent className="space-y-3 text-xs">
             <div className="flex items-center justify-between py-1.5 border-b border-border">
               <span className="text-muted-foreground">Login</span>
-              <span className="font-semibold text-foreground">
-                {isGoogle ? "Google" : "E-mail e senha"}
-              </span>
+              <span className="font-semibold text-foreground">E-mail e senha</span>
             </div>
             {profile?.created_at && (
               <div className="flex items-center justify-between py-1.5">

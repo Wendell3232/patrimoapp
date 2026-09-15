@@ -62,8 +62,8 @@ function Privacidade() {
           <li>Cookies de publicidade ou rastreamento de terceiros para marketing.</li>
         </ul>
         <p>
-          Se você entrar com o Google, recebemos apenas nome, e-mail e identificador da conta
-          Google, com sua autorização.
+          Não usamos logins de terceiros: o acesso à conta é feito apenas com
+          e-mail e senha cadastrados no Patrimo.
         </p>
       </section>
 
@@ -71,7 +71,7 @@ function Privacidade() {
         <h2>3. Para que usamos</h2>
         <ul>
           <li><strong>Execução do contrato:</strong> manter sua conta e calcular seus números.</li>
-          <li><strong>Consentimento:</strong> login com Google e uso do assistente financeiro.</li>
+          <li><strong>Consentimento:</strong> uso do assistente financeiro.</li>
           <li><strong>Interesse legítimo:</strong> segurança, prevenção de abuso e correção de erros.</li>
           <li><strong>Obrigação legal:</strong> atendimento a determinações legais e a pedidos de titulares.</li>
         </ul>
@@ -87,7 +87,6 @@ function Privacidade() {
         <ul>
           <li>Provedor de hospedagem, banco de dados e autenticação da aplicação.</li>
           <li>Provedor do modelo de linguagem que responde no assistente financeiro, apenas quando você envia uma pergunta.</li>
-          <li>Google, apenas se você optar pelo login com Google.</li>
           <li>Autoridades competentes, quando houver obrigação legal ou ordem judicial.</li>
         </ul>
       </section>

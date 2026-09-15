@@ -126,20 +126,6 @@ function AuthPage() {
     }
   }
 
-  async function handleGoogle() {
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth-callback`,
-      },
-    });
-    setLoading(false);
-    if (error) {
-      toast.error("Não foi possível entrar com o Google.");
-    }
-  }
-
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-5">
       <section className="relative w-full max-w-md">
@@ -161,7 +147,7 @@ function AuthPage() {
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {mode === "entrar"
-              ? "Use seu e-mail e senha ou entre com o Google."
+              ? "Use seu e-mail e senha para entrar."
               : "Leva menos de um minuto para começar."}
           </p>
 
@@ -240,22 +226,6 @@ function AuthPage() {
                   {mode === "entrar" ? "Entrar" : "Criar conta"}
                 </Button>
               </form>
-
-              <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
-                <span className="h-px flex-1 bg-border" />
-                ou
-                <span className="h-px flex-1 bg-border" />
-              </div>
-
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full"
-                onClick={handleGoogle}
-                disabled={loading}
-              >
-                Continuar com Google
-              </Button>
             </TabsContent>
           </Tabs>
         </div>
