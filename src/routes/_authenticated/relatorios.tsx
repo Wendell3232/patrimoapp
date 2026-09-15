@@ -110,6 +110,9 @@ function Relatorios() {
   const [filterCard, setFilterCard] = useState("todos");
   const [filterCategory, setFilterCategory] = useState("todas");
   const [includeTransfers, setIncludeTransfers] = useState(false);
+  const [filterKind, setFilterKind] = useState("todos");
+  const [onlyRecurring, setOnlyRecurring] = useState(false);
+  const [onlyInstallments, setOnlyInstallments] = useState(false);
 
   // Modal para ver transações ao clicar em categoria ou gráfico
   const [inspectCategory, setInspectCategory] = useState<{
@@ -129,9 +132,22 @@ function Relatorios() {
         return false;
       if (filterCard !== "todos" && tx.credit_card_id !== filterCard) return false;
       if (filterCategory !== "todas" && tx.category_id !== filterCategory) return false;
+      if (filterKind !== "todos" && tx.kind !== filterKind) return false;
+      if (onlyRecurring && !tx.installment_group && !tx.notes?.includes("recorrente")) return false;
+      if (onlyInstallments && !tx.installment_group) return false;
       return true;
     });
-  }, [data, period, filterAccount, filterCard, filterCategory, includeTransfers]);
+  }, [
+    data,
+    period,
+    filterAccount,
+    filterCard,
+    filterCategory,
+    filterKind,
+    onlyRecurring,
+    onlyInstallments,
+    includeTransfers,
+  ]);
 
   // Transações do período anterior para comparação
   const previousTransactions = useMemo(() => {
@@ -356,17 +372,59 @@ Gerado no Patrimo Brasil`;
               </Select>
             </div>
 
-            <div className="flex items-center justify-between self-end pb-1 pt-4 sm:pt-0">
-              <Label htmlFor="toggle-transfers" className="text-xs cursor-pointer">
-                Incluir transferências internas
-              </Label>
-              <input
-                type="checkbox"
-                id="toggle-transfers"
-                checked={includeTransfers}
-                onChange={(e) => setIncludeTransfers(e.target.checked)}
-                className="h-4 w-4 rounded border-border"
-              />
+            <div className="space-y-1.5">
+              <Label className="text-xs">Tipo de movimentação</Label>
+              <Select value={filterKind} onValueChange={setFilterKind}>
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os tipos</SelectItem>
+                  <SelectItem value="receita">Apenas receitas</SelectItem>
+                  <SelectItem value="despesa">Apenas despesas</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-3 self-end sm:col-span-2 lg:col-span-4 border-t border-border/60 pt-3">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="toggle-transfers"
+                  checked={includeTransfers}
+                  onChange={(e) => setIncludeTransfers(e.target.checked)}
+                  className="h-4 w-4 rounded border-border"
+                />
+                <Label htmlFor="toggle-transfers" className="text-xs cursor-pointer">
+                  Incluir transferências internas
+                </Label>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="toggle-recurring"
+                  checked={onlyRecurring}
+                  onChange={(e) => setOnlyRecurring(e.target.checked)}
+                  className="h-4 w-4 rounded border-border"
+                />
+                <Label htmlFor="toggle-recurring" className="text-xs cursor-pointer">
+                  Somente recorrentes
+                </Label>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="toggle-installments"
+                  checked={onlyInstallments}
+                  onChange={(e) => setOnlyInstallments(e.target.checked)}
+                  className="h-4 w-4 rounded border-border"
+                />
+                <Label htmlFor="toggle-installments" className="text-xs cursor-pointer">
+                  Somente parceladas
+                </Label>
+              </div>
             </div>
           </CardContent>
         </Card>

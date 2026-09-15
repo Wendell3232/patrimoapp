@@ -14,6 +14,7 @@ export interface Profile {
   id: string;
   full_name: string;
   email: string | null;
+  created_at: string;
   onboarding_completed: boolean;
   onboarding_step: number;
   plan: "mensal" | "anual" | null;

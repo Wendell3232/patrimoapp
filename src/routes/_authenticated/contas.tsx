@@ -52,6 +52,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { useFinance, useRefreshFinance } from "@/lib/data";
 import {
@@ -304,6 +310,7 @@ function Contas() {
         </div>
 
         {/* CARDS DAS CONTAS */}
+        <TooltipProvider delayDuration={100}>
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {activeAccounts.map((account) => {
             const avail = accountAvailability(
@@ -388,7 +395,16 @@ function Contas() {
 
                     {avail.committedAmount > 0 && (
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground">Comprometido (30 dias):</span>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="text-muted-foreground cursor-help border-b border-dotted border-border">
+                              Comprometido (30 dias):
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" align="start">
+                            Pagamentos, contas e faturas de cartão já previstos para sair desta conta nos próximos 30 dias.
+                          </TooltipContent>
+                        </Tooltip>
                         <span className="font-medium text-destructive tabular">
                           - {formatBRL(avail.committedAmount)}
                         </span>
@@ -396,9 +412,16 @@ function Contas() {
                     )}
 
                     <div className="border-t border-border/60 pt-1.5 flex items-center justify-between">
-                      <span className="text-xs font-semibold text-foreground">
-                        Disponível de verdade:
-                      </span>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="text-xs font-semibold text-foreground cursor-help border-b border-dotted border-border">
+                            Disponível de verdade:
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" align="start">
+                          Saldo atual menos os valores comprometidos: é o quanto você pode usar sem comprometer seus pagamentos dos próximos 30 dias.
+                        </TooltipContent>
+                      </Tooltip>
                       <span
                         className={`text-base font-bold tabular ${
                           avail.availableBalance >= 0 ? "text-positive" : "text-destructive"
@@ -436,6 +459,7 @@ function Contas() {
             );
           })}
         </div>
+        </TooltipProvider>
       </div>
 
       {/* DIALOG: HISTÓRICO DETALHADO DA CONTA COM TRATAMENTO ESPECIAL PARA TRANSFERÊNCIAS */}

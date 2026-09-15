@@ -124,6 +124,12 @@ function Perfil() {
                 <Lock className="h-3 w-3" />
                 Seu e-mail é vinculado com segurança à sua conta de acesso.
               </p>
+              {isGoogle && (
+                <p className="text-[11px] text-muted-foreground flex items-center gap-1 mt-1">
+                  <Mail className="h-3 w-3 text-primary" />
+                  Este e-mail vem da sua conta Google e não pode ser alterado pelo Patrimo.
+                </p>
+              )}
             </div>
 
             <Button onClick={() => void save()} disabled={saving} size="sm">
@@ -153,6 +159,16 @@ function Perfil() {
                 <CheckCircle2 className="h-3.5 w-3.5" /> Verificada
               </span>
             </div>
+
+            {profile?.created_at && (
+              <div className="flex items-center justify-between py-1.5 border-b border-border">
+                <span className="text-muted-foreground">Conta criada em</span>
+                <span className="font-semibold text-foreground flex items-center gap-1">
+                  <Calendar className="h-3.5 w-3.5" />{" "}
+                  {formatDate(profile.created_at.slice(0, 10))}
+                </span>
+              </div>
+            )}
 
             <div className="flex items-center justify-between py-1.5">
               <span className="text-muted-foreground">Privacidade dos dados</span>
