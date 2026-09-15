@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -141,44 +141,15 @@ function AuthPage() {
   }
 
   return (
-    <main className="grid min-h-screen bg-background lg:grid-cols-[1.05fr_1fr]">
-      <section className="hidden flex-col justify-between bg-primary p-12 text-primary-foreground lg:flex">
-        <Link to="/" className="flex items-center gap-3 font-display text-xl font-semibold">
-          <span className="flex h-10 w-10 items-center justify-center rounded-md bg-primary-foreground font-bold text-primary">
-            P
-          </span>
-          Patrimo
-        </Link>
-        <div className="max-w-md space-y-6">
-          <h1 className="font-display text-4xl leading-tight">
-            Seu patrimônio, mês a mês, com clareza absoluta.
-          </h1>
-          <p className="text-sm leading-relaxed text-primary-foreground/75">
-            Patrimônio contínuo entre meses, receitas e despesas do período, transferências neutras
-            e cartões com parcelas projetadas automaticamente.
-          </p>
-          <ul className="space-y-3 text-sm text-primary-foreground/85">
-            <li className="flex items-center gap-3">
-              <ShieldCheck className="h-4 w-4 text-positive" />
-              Dados isolados por usuário
-            </li>
-            <li className="flex items-center gap-3">
-              <ShieldCheck className="h-4 w-4 text-positive" />
-              Sem conexão com bancos externos
-            </li>
-          </ul>
-        </div>
-        
-      </section>
-
-      <section className="relative flex items-center justify-center px-5 py-12 sm:px-8">
-        <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
+    <main className="flex min-h-screen items-center justify-center bg-background px-5">
+      <section className="relative w-full max-w-md">
+        <div className="absolute -top-4 right-0 sm:-top-2">
           <ThemeToggle />
         </div>
-        <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-elevated sm:p-8 lg:border-0 lg:shadow-none">
+        <div className="w-full rounded-lg border border-border bg-card p-6 shadow-elevated sm:p-8">
           <Link
             to="/"
-            className="flex items-center gap-2 font-display text-xl font-semibold lg:hidden"
+            className="flex items-center gap-2 font-display text-xl font-semibold"
           >
             <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-xs font-bold text-primary-foreground">
               P

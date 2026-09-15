@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, CreditCard, LineChart, Moon, ShieldCheck, Target, Wallet } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 
 import { ThemeToggle } from "@/components/app/ThemeToggle";
 import { Button } from "@/components/ui/button";
@@ -26,29 +26,6 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-const PILLARS = [
-  {
-    icon: Wallet,
-    title: "Patrimônio contínuo",
-    text: "Seu saldo acumula mês após mês. Transferências entre contas não distorcem nada.",
-  },
-  {
-    icon: CreditCard,
-    title: "Cartões sem surpresa",
-    text: "Compras parceladas geram as parcelas futuras e a fatura só debita no pagamento.",
-  },
-  {
-    icon: Target,
-    title: "Metas com cálculo pronto",
-    text: "Informe o valor e o prazo. Mostramos quanto guardar por mês.",
-  },
-  {
-    icon: LineChart,
-    title: "Relatórios objetivos",
-    text: "Entradas, despesas, categorias e evolução do patrimônio em gráficos limpos.",
-  },
-];
-
 function Landing() {
   return (
     <div className="min-h-screen bg-background">
@@ -69,48 +46,25 @@ function Landing() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 pb-24">
-        <section className="py-14 sm:py-20">
-          <p className="text-xs font-semibold uppercase text-primary">Finanças pessoais em reais</p>
-          <h1 className="mt-4 max-w-4xl font-display text-4xl font-semibold leading-tight sm:text-5xl">
-            Enxergue seu dinheiro por completo, do saldo de hoje ao compromisso do próximo ano.
-          </h1>
-          <p className="mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg">
-            Contas, cartões, parcelas, metas e orçamentos organizados com regras financeiras
-            corretas. Sem conexão bancária, sem planilha, sem ruído.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button asChild size="lg">
-              <Link to="/auth">
-                Criar minha conta
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-          <p className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
-            <ShieldCheck className="h-4 w-4 text-primary" />
-            Cada pessoa acessa apenas os próprios dados.
-          </p>
-          <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-            <Moon className="h-4 w-4 text-primary" />
-            Tema claro, escuro ou automático.
-          </p>
-        </section>
-
-        <section className="grid gap-6 sm:grid-cols-2">
-          {PILLARS.map((pillar) => (
-            <article
-              key={pillar.title}
-              className="rounded-lg border border-border bg-card p-6 shadow-elevated transition-transform hover:-translate-y-0.5"
-            >
-              <span className="flex h-11 w-11 items-center justify-center rounded-md bg-primary/10">
-                <pillar.icon className="h-5 w-5 text-primary" />
-              </span>
-              <h2 className="mt-4 font-display text-lg font-semibold">{pillar.title}</h2>
-              <p className="mt-2 text-sm text-muted-foreground">{pillar.text}</p>
-            </article>
-          ))}
-        </section>
+      <main className="mx-auto flex max-w-3xl flex-col items-center px-6 pb-24 pt-20 text-center">
+        <h1 className="font-display text-4xl font-semibold leading-tight sm:text-5xl">
+          Suas finanças em um só lugar.
+        </h1>
+        <p className="mt-5 text-base text-muted-foreground sm:text-lg">
+          Contas, cartões, metas e relatórios simples, sem planilha.
+        </p>
+        <div className="mt-8">
+          <Button asChild size="lg">
+            <Link to="/auth">
+              Criar minha conta
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+        <p className="mt-8 flex items-center gap-2 text-sm text-muted-foreground">
+          <ShieldCheck className="h-4 w-4 text-primary" />
+          Cada pessoa acessa apenas os próprios dados.
+        </p>
       </main>
     </div>
   );

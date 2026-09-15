@@ -304,7 +304,7 @@ function Dashboard() {
   );
 
   return (
-    <AppShell title="Visão geral" description="Como estão suas finanças agora" actions={null}>
+    <AppShell title="Visão geral" description="Resumo das suas finanças" actions={null}>
       <div className="space-y-6">
         {/* Seletor de período e Ações Rápidas */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -346,7 +346,7 @@ function Dashboard() {
               </div>
             </CardHeader>
             <CardContent className="pt-0 text-xs text-muted-foreground">
-              Soma do saldo disponível em todas as suas contas cadastradas.
+              Saldo somado de todas as suas contas.
             </CardContent>
           </Card>
 
@@ -388,7 +388,7 @@ function Dashboard() {
               </div>
             </CardHeader>
             <CardContent className="pt-0 text-xs text-muted-foreground">
-              Resultado exclusivo deste período (não se mistura com o saldo total).
+              Resultado do período, sem misturar com o saldo total.
             </CardContent>
           </Card>
 
@@ -478,9 +478,9 @@ function Dashboard() {
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-base">Onde está meu dinheiro?</CardTitle>
+                  <CardTitle className="text-base">Distribuição entre contas</CardTitle>
                   <CardDescription className="text-xs">
-                    Divisão dos seus saldos entre contas correntes, poupanças e investimentos.
+                    Como seu saldo está dividido entre as contas.
                   </CardDescription>
                 </div>
                 <Button asChild variant="ghost" size="sm" className="h-8 text-xs">
@@ -521,9 +521,9 @@ function Dashboard() {
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-base">Para onde foi meu dinheiro?</CardTitle>
+                  <CardTitle className="text-base">Principais gastos</CardTitle>
                   <CardDescription className="text-xs">
-                    Categorias que mais tiveram saídas no período selecionado.
+                    Categorias com mais saídas no período.
                   </CardDescription>
                 </div>
                 <Button asChild variant="ghost" size="sm" className="h-8 text-xs">
@@ -585,9 +585,16 @@ function Dashboard() {
         <div className="grid gap-5 lg:grid-cols-3">
           <Card className="lg:col-span-2">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">Evolução do meu dinheiro ao longo do tempo</CardTitle>
+              <CardTitle className="text-base">Evolução do patrimônio</CardTitle>
               <CardDescription className="text-xs">
-                Nos últimos meses, suas reservas variaram entre {formatBRLCompact(view.minWorth)} e {formatBRLCompact(view.maxWorth)}, acumulando {formatBRL(view.worthTotal)} hoje.
+                {formatBRL(
+                  view.worthTotal
+                )}{" "}
+                hoje, entre{" "}
+                {formatBRLCompact(view.minWorth)}{" "}
+                e{" "}
+                {formatBRLCompact(view.maxWorth)}{" "}
+                nos últimos meses.
               </CardDescription>
             </CardHeader>
             <CardContent className="h-64 pt-2">
@@ -664,7 +671,7 @@ function Dashboard() {
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Entradas e saídas nos últimos meses</CardTitle>
               <CardDescription className="text-xs">
-                Comparativo mensal entre quanto entrou (verde) e quanto saiu (vermelho).
+                Comparativo mensal de entradas e saídas.
               </CardDescription>
             </CardHeader>
             <CardContent className="h-64 pt-2">
@@ -695,7 +702,7 @@ function Dashboard() {
                 Agente Financeiro
               </CardTitle>
               <CardDescription className="text-xs">
-                Seu assistente inteligente de leitura dos números.
+                Resumo prático dos seus números.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -719,11 +726,11 @@ function Dashboard() {
             <div>
               <CardTitle className="text-base">Últimas movimentações</CardTitle>
               <CardDescription className="text-xs">
-                Atividades mais recentes dentro do período selecionado.
+                Mais recentes do período.
               </CardDescription>
             </div>
             <Button asChild variant="outline" size="sm" className="h-8 text-xs">
-              <Link to="/movimentacoes">Ver todas as movimentações</Link>
+              <Link to="/movimentacoes">Ver todas</Link>
             </Button>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -790,7 +797,7 @@ function Dashboard() {
             </DialogDescription>
           </DialogHeader>
           <div className="mt-4 flex justify-end">
-            <Button onClick={() => setHelpOpen(false)}>Entendi, obrigado!</Button>
+            <Button onClick={() => setHelpOpen(false)}>Entendi</Button>
           </div>
         </DialogContent>
       </Dialog>
