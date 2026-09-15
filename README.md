@@ -1,8 +1,9 @@
-# Fluxo Pessoal
+# Patrimo
 
-Criar um aplicativo web completo e premium de organização financeira pessoal (fintech moderna, BRL, sem emojis, tipografia e ícones vetoriais refinados).
+Aplicativo web de organização financeira pessoal (BRL): patrimônio contínuo entre meses, receitas e despesas do período, transferências neutras e cartões com parcelas projetadas automaticamente.
 
-Principais pilares e regras obrigatórias:
+**Live app**: https://patrimoapp-blush.vercel.app
+**Página de vendas**: https://patrimoapp-blush.vercel.app/oferta
 1. Autenticação completa (e-mail/senha com toggle ver/ocultar senha, Google auth) com isolamento rigoroso por usuário (RLS no banco).
 2. Regras financeiras:
    - Patrimônio contínuo e acumulativo entre meses (não reseta na virada de mês).
