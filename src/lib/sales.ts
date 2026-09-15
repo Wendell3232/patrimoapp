@@ -5,4 +5,7 @@ export const PRICE_LABEL = "R$ 37,90";
 export const CHECKOUT_URL =
   "https://checkout.wiven.com.br/checkout/cmu33jyq100h801og7wiqnr04?offer=VO27VYQ";
 
-export const LICENSE_OWNER_EMAILS: string[] = ["wendellsilva673@gmail.com"];
+export const LICENSE_OWNER_EMAILS: string[] = [
+  "wendellsilva673@gmail.com",
+  "atv.didaticas@gmail.com",
+];
