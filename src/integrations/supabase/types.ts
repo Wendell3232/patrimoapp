@@ -280,6 +280,38 @@ export type Database = {
           },
         ]
       }
+      licenses: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          redeemed_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          redeemed_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          redeemed_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "licenses_used_by_fkey"
+            columns: ["used_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string
@@ -450,6 +482,10 @@ export type Database = {
       ensure_profile: {
         Args: { p_email?: string; p_full_name?: string }
         Returns: undefined
+      }
+      redeem_license: {
+        Args: { p_code: string }
+        Returns: boolean
       }
     }
     Enums: {

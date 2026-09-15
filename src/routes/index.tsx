@@ -55,7 +55,7 @@ function Landing() {
         </p>
         <div className="mt-8">
           <Button asChild size="lg">
-            <Link to="/auth">
+            <Link to="/oferta">
               Criar minha conta
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
@@ -63,7 +63,7 @@ function Landing() {
         </div>
         <p className="mt-8 flex items-center gap-2 text-sm text-muted-foreground">
           <ShieldCheck className="h-4 w-4 text-primary" />
-          Cada pessoa acessa apenas os próprios dados.
+          Acesso vitalício por R$ 37,90, pagamento único.
         </p>
       </main>
     </div>
