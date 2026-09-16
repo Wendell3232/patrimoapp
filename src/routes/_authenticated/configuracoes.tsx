@@ -415,9 +415,6 @@ function Configuracoes() {
               <CardTitle className="text-base flex items-center gap-2">
                 <Bell className="h-4 w-4 text-primary" /> Prazos e preferências de alertas
               </CardTitle>
-              <CardDescription className="text-xs">
-                Escolha com quanto tempo de antecedência e em quais situações deseja receber avisos automáticos.
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 max-w-xl">
               <div className="space-y-1.5">
@@ -484,9 +481,6 @@ function Configuracoes() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Aparência do aplicativo</CardTitle>
-              <CardDescription className="text-xs">
-                Escolha o tema visual que melhor se adapta ao seu ambiente.
-              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-3 sm:grid-cols-3">
@@ -520,9 +514,6 @@ function Configuracoes() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Formato e ciclo mensal</CardTitle>
-              <CardDescription className="text-xs">
-                Configurações regionais e período do seu mês financeiro.
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 max-w-xl">
               <div className="space-y-1.5">

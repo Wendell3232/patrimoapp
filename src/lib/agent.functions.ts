@@ -1,7 +1,8 @@
-import { createServerFn } from "@tanstack/react-start";
+﻿import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { toMoney } from "./finance";
 
 const askSchema = z.object({
   question: z.string().trim().min(3, "Escreva sua pergunta.").max(500),
@@ -108,7 +109,7 @@ export const askAgent = createServerFn({ method: "POST" })
         name: a.name ?? "",
         type: (a.type ?? "corrente") as "corrente" | "poupanca" | "dinheiro" | "investimentos",
         institution: a.institution ?? null,
-        opening_balance: Number(a.opening_balance ?? 0),
+        opening_balance: toMoney(a.opening_balance),
         color: a.color ?? "#3b82f6",
         archived: Boolean(a.archived),
       })),
@@ -116,7 +117,7 @@ export const askAgent = createServerFn({ method: "POST" })
         id: c.id ?? "",
         name: c.name ?? "",
         brand: c.brand ?? null,
-        limit_amount: Number(c.limit_amount ?? 0),
+        limit_amount: toMoney(c.limit_amount),
         closing_day: Number(c.closing_day ?? 28),
         due_day: Number(c.due_day ?? 5),
         payment_account_id: c.payment_account_id ?? null,
@@ -133,7 +134,7 @@ export const askAgent = createServerFn({ method: "POST" })
       transactions: (transactions.data ?? []).map((t) => ({
         id: t.id ?? "",
         kind: (t.kind ?? "despesa") as "receita" | "despesa" | "transferencia",
-        amount: Number(t.amount ?? 0),
+        amount: toMoney(t.amount),
         occurred_on: t.occurred_on ?? "",
         description: t.description ?? "",
         notes: t.notes ?? null,
@@ -150,7 +151,7 @@ export const askAgent = createServerFn({ method: "POST" })
       commitments: (commitments.data ?? []).map((com) => ({
         id: com.id ?? "",
         description: com.description ?? "",
-        amount: Number(com.amount ?? 0),
+        amount: toMoney(com.amount),
         due_date: com.due_date ?? "",
         kind: (com.kind ?? "despesa") as "receita" | "despesa",
         status: (com.status ?? "pendente") as "pendente" | "pago",
@@ -162,8 +163,8 @@ export const askAgent = createServerFn({ method: "POST" })
       goals: (goals.data ?? []).map((g) => ({
         id: g.id ?? "",
         name: g.name ?? "",
-        target_amount: Number(g.target_amount ?? 0),
-        current_amount: Number(g.current_amount ?? 0),
+        target_amount: toMoney(g.target_amount),
+        current_amount: toMoney(g.current_amount),
         target_date: g.target_date ?? "",
         account_id: g.account_id ?? null,
       })),
@@ -171,7 +172,7 @@ export const askAgent = createServerFn({ method: "POST" })
         id: b.id ?? "",
         category_id: b.category_id ?? "",
         month: b.month ?? "",
-        limit_amount: Number(b.limit_amount ?? 0),
+        limit_amount: toMoney(b.limit_amount),
       })),
       notifications: [],
     };

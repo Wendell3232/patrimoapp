@@ -639,9 +639,6 @@ Gerado no Patrimo Brasil`;
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Evolução do dinheiro guardado</CardTitle>
-            <CardDescription className="text-xs text-foreground font-medium">
-              Acompanhe a trajetória de crescimento do seu saldo total ao longo do tempo.
-            </CardDescription>
           </CardHeader>
           <CardContent className="h-64 pt-2">
             <ResponsiveContainer width="100%" height="100%">

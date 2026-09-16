@@ -421,6 +421,12 @@ export function buildInstallments(
 
 /* --------------------------------------------------------- metas/orçamentos */
 
+/** Converte para número finito, evitando que NaN/Infinity contaminem cálculos. */
+export function toMoney(value: unknown): number {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
 export function monthsUntil(targetISO: string, from: Date = new Date()): number {
   const target = parseISODate(targetISO);
   const months =
@@ -429,8 +435,9 @@ export function monthsUntil(targetISO: string, from: Date = new Date()): number 
 }
 
 export function requiredMonthlySaving(goal: Goal, from: Date = new Date()): number {
-  const missing = Math.max(Number(goal.target_amount) - Number(goal.current_amount), 0);
-  return missing / monthsUntil(goal.target_date, from);
+  const missing = Math.max(toMoney(goal.target_amount) - toMoney(goal.current_amount), 0);
+  const months = monthsUntil(goal.target_date, from);
+  return missing / (Number.isFinite(months) && months > 0 ? months : 1);
 }
 
 export interface BudgetStatus {
@@ -581,12 +588,12 @@ export function goalPacing(goal: Goal): {
   status: "no_ritmo" | "atencao" | "atrasada";
   statusLabel: string;
 } {
-  const target = Number(goal.target_amount);
-  const current = Number(goal.current_amount);
+  const target = toMoney(goal.target_amount);
+  const current = toMoney(goal.current_amount);
   const missing = Math.max(target - current, 0);
   const percentage = target > 0 ? Math.min((current / target) * 100, 100) : 0;
   const monthsLeft = monthsUntil(goal.target_date);
-  const monthlyNeeded = missing / monthsLeft;
+  const monthlyNeeded = missing / (Number.isFinite(monthsLeft) && monthsLeft > 0 ? monthsLeft : 1);
 
   // Avaliação do ritmo
   let status: "no_ritmo" | "atencao" | "atrasada" = "no_ritmo";

@@ -82,7 +82,12 @@ async function fetchFinance(): Promise<FinanceData> {
     const list = (rows ?? []) as Record<string, unknown>[];
     return list.map((row) => {
       const copy: Record<string, unknown> = { ...row };
-      for (const key of keys) if (copy[key] != null) copy[key] = Number(copy[key]);
+      for (const key of keys) {
+        if (copy[key] != null) {
+          const n = Number(copy[key]);
+          copy[key] = Number.isFinite(n) ? n : 0;
+        }
+      }
       return copy as T;
     });
   }

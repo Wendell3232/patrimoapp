@@ -21,7 +21,7 @@ const formatter = new Intl.NumberFormat("pt-BR", {
 /** Campo monetário em BRL. Aceita apenas dígitos e nunca produz valor negativo. */
 export const CurrencyInput = forwardRef<HTMLInputElement, CurrencyInputProps>(
   ({ value, onValueChange, className, placeholder = "R$ 0,00", ...rest }, ref) => {
-    const display = value == null ? "" : formatter.format(value);
+    const display = value == null || !Number.isFinite(value) ? "" : formatter.format(value);
 
     return (
       <Input
@@ -37,7 +37,8 @@ export const CurrencyInput = forwardRef<HTMLInputElement, CurrencyInputProps>(
             onValueChange(null);
             return;
           }
-          onValueChange(Number(digits) / 100);
+          const parsed = Number(digits) / 100;
+          onValueChange(Number.isFinite(parsed) ? parsed : null);
         }}
         {...rest}
       />

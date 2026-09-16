@@ -545,9 +545,6 @@ function Orcamentos() {
                   <CardTitle className="text-sm font-bold flex items-center gap-2">
                     <Info className="h-4 w-4 text-primary" /> Gastos sem orçamento definido
                   </CardTitle>
-                  <CardDescription className="text-xs">
-                    Categorias que tiveram saídas neste mês, mas ainda não possuem limite configurado.
-                  </CardDescription>
                 </div>
               </div>
             </CardHeader>

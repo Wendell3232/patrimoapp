@@ -19,15 +19,9 @@ import {
   ArrowDownRight,
   ArrowRight,
   ArrowUpRight,
-  CalendarClock,
-  CheckCircle2,
-  CircleDollarSign,
-  CreditCard,
   HelpCircle,
   Info,
-  PiggyBank,
   Sparkles,
-  Target,
   Wallet,
   X,
 } from "lucide-react";
@@ -37,7 +31,7 @@ import { PeriodSelector } from "@/components/app/PeriodSelector";
 import { QuickActions } from "@/components/app/QuickActions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -247,11 +241,6 @@ function Dashboard() {
       }
     }
 
-    // Resumo para a frase analítica da evolução
-    const worthValues = worthSeries.map((s) => s.value);
-    const minWorth = worthValues.length ? Math.min(...worthValues) : 0;
-    const maxWorth = worthValues.length ? Math.max(...worthValues) : 0;
-
     return {
       totals,
       previous,
@@ -265,8 +254,6 @@ function Dashboard() {
       recent,
       unusual,
       nextAttention,
-      minWorth,
-      maxWorth,
     };
   }, [data, period, anchor]);
 
@@ -303,6 +290,8 @@ function Dashboard() {
     (u) => !dismissedAlerts.includes(u.transaction.id),
   );
 
+  const showAttention = view.nextAttention.type !== "ok";
+
   return (
     <AppShell title="Visão geral" description="Resumo das suas finanças" actions={null}>
       <div className="space-y-6">
@@ -319,8 +308,8 @@ function Dashboard() {
           <QuickActions compact />
         </div>
 
-        {/* 1. TOPO: APENAS OS 3 CARDS PRINCIPAIS */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {/* 1. TOPO: APENAS OS CARDS PRINCIPAIS */}
+        <div className={showAttention ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3" : "grid gap-4 sm:grid-cols-2"}>
           {/* Card 1: Meu dinheiro hoje */}
           <Card className="relative flex flex-col justify-between border-primary/20 bg-gradient-to-br from-card to-card/90 shadow-sm">
             <CardHeader className="pb-2">
@@ -345,9 +334,6 @@ function Dashboard() {
                 </span>
               </div>
             </CardHeader>
-            <CardContent className="pt-0 text-xs text-muted-foreground">
-              Saldo somado de todas as suas contas.
-            </CardContent>
           </Card>
 
           {/* Card 2: Como foi o período */}
@@ -387,40 +373,35 @@ function Dashboard() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pt-0 text-xs text-muted-foreground">
-              Resultado do período, sem misturar com o saldo total.
-            </CardContent>
           </Card>
 
-          {/* Card 3: Sua próxima atenção */}
-          <Card className="relative flex flex-col justify-between border-amber-500/30 bg-gradient-to-br from-card to-amber-500/5 shadow-sm sm:col-span-2 lg:col-span-1">
-            <CardHeader className="pb-2">
-              <div className="flex items-center gap-2">
-                {view.nextAttention.type === "ok" ? (
-                  <CheckCircle2 className="h-4 w-4 text-positive" />
-                ) : (
+          {/* Card 3: Sua próxima atenção (apenas se houver alerta real) */}
+          {showAttention && (
+            <Card className="relative flex flex-col justify-between border-amber-500/30 bg-gradient-to-br from-card to-amber-500/5 shadow-sm sm:col-span-2 lg:col-span-1">
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
                   <AlertCircle className="h-4 w-4 text-amber-500" />
-                )}
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Sua próxima atenção
-                </span>
-              </div>
-              <p className="mt-1 font-semibold text-foreground">
-                {view.nextAttention.title}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {view.nextAttention.description}
-              </p>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <Button asChild size="sm" variant="outline" className="w-full justify-between">
-                <Link to={view.nextAttention.actionTo}>
-                  <span>{view.nextAttention.actionLabel}</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Sua próxima atenção
+                  </span>
+                </div>
+                <p className="mt-1 font-semibold text-foreground">
+                  {view.nextAttention.title}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {view.nextAttention.description}
+                </p>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <Button asChild size="sm" variant="outline" className="w-full justify-between">
+                  <Link to={view.nextAttention.actionTo}>
+                    <span>{view.nextAttention.actionLabel}</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* ALERTA INTELIGENTE DE GASTO FORA DO PADRÃO (SE HOUVER) */}
@@ -479,9 +460,6 @@ function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-base">Distribuição entre contas</CardTitle>
-                  <CardDescription className="text-xs">
-                    Como seu saldo está dividido entre as contas.
-                  </CardDescription>
                 </div>
                 <Button asChild variant="ghost" size="sm" className="h-8 text-xs">
                   <Link to="/contas">Ver contas</Link>
@@ -522,9 +500,6 @@ function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-base">Principais gastos</CardTitle>
-                  <CardDescription className="text-xs">
-                    Categorias com mais saídas no período.
-                  </CardDescription>
                 </div>
                 <Button asChild variant="ghost" size="sm" className="h-8 text-xs">
                   <Link to="/movimentacoes">Ver detalhes</Link>
@@ -586,16 +561,6 @@ function Dashboard() {
           <Card className="lg:col-span-2">
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Evolução do patrimônio</CardTitle>
-              <CardDescription className="text-xs">
-                {formatBRL(
-                  view.worthTotal
-                )}{" "}
-                hoje, entre{" "}
-                {formatBRLCompact(view.minWorth)}{" "}
-                e{" "}
-                {formatBRLCompact(view.maxWorth)}{" "}
-                nos últimos meses.
-              </CardDescription>
             </CardHeader>
             <CardContent className="h-64 pt-2">
               <ResponsiveContainer width="100%" height="100%">
@@ -632,9 +597,6 @@ function Dashboard() {
           <Card className="flex flex-col justify-between">
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Contas e pagamentos futuros</CardTitle>
-              <CardDescription className="text-xs">
-                Valores já previstos para os próximos meses.
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {view.upcomingCommitments.length === 0 ? (
@@ -670,9 +632,6 @@ function Dashboard() {
           <Card className="lg:col-span-2">
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Entradas e saídas nos últimos meses</CardTitle>
-              <CardDescription className="text-xs">
-                Comparativo mensal de entradas e saídas.
-              </CardDescription>
             </CardHeader>
             <CardContent className="h-64 pt-2">
               <ResponsiveContainer width="100%" height="100%">
@@ -701,9 +660,6 @@ function Dashboard() {
                 <Sparkles className="h-4 w-4 text-primary" />
                 Agente Financeiro
               </CardTitle>
-              <CardDescription className="text-xs">
-                Resumo prático dos seus números.
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               <p className="text-sm text-foreground">
@@ -725,9 +681,6 @@ function Dashboard() {
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <div>
               <CardTitle className="text-base">Últimas movimentações</CardTitle>
-              <CardDescription className="text-xs">
-                Mais recentes do período.
-              </CardDescription>
             </div>
             <Button asChild variant="outline" size="sm" className="h-8 text-xs">
               <Link to="/movimentacoes">Ver todas</Link>

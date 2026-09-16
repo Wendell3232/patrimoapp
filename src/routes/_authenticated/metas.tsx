@@ -54,7 +54,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useFinance, useRefreshFinance } from "@/lib/data";
-import { goalPacing, type Goal } from "@/lib/finance";
+import { goalPacing, toMoney, type Goal } from "@/lib/finance";
 import { formatBRL, formatDate, formatMonthLabel, parseISODate, toISODate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/metas")({
@@ -167,12 +167,12 @@ function Metas() {
 
   async function saveDeposit() {
     if (!depositing || !data) return;
-    if (depositAmount == null || depositAmount <= 0) {
+    if (depositAmount == null || !Number.isFinite(depositAmount) || depositAmount <= 0) {
       setDepositError("Informe quanto você guardou para a meta.");
       return;
     }
 
-    const newCurrent = Number(depositing.current_amount) + depositAmount;
+    const newCurrent = toMoney(depositing.current_amount) + depositAmount;
 
     // Se o usuário optou por descontar da conta bancária
     if (deductFromAccount && depositAccount) {
