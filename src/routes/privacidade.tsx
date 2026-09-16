@@ -31,7 +31,7 @@ function Privacidade() {
         <p>
           O Patrimo trata seus dados pessoais como controlador, conforme a Lei Geral de Proteção de
           Dados (Lei nº 13.709/2018). Contato de privacidade e encarregado (DPO):{" "}
-          <strong>privacidade@patrimoapp.com</strong>.
+          <strong>atv.didaticas@gmail.com</strong>.
         </p>
       </section>
 
@@ -123,7 +123,7 @@ function Privacidade() {
           <li><strong>Acesso e portabilidade:</strong> baixe todos os seus dados em JSON em Perfil, no cartão Privacidade e dados.</li>
           <li><strong>Correção:</strong> edite nome, renda, contas e lançamentos nas próprias telas do app.</li>
           <li><strong>Exclusão e revogação de consentimento:</strong> use Excluir minha conta em Perfil.</li>
-          <li><strong>Informação e oposição:</strong> esta página descreve todo o tratamento; para se opor a algum uso, escreva para <strong>privacidade@patrimoapp.com</strong>.</li>
+          <li><strong>Informação e oposição:</strong> esta página descreve todo o tratamento; para se opor a algum uso, escreva para <strong>atv.didaticas@gmail.com</strong>.</li>
         </ul>
         <p>
           Pedidos enviados por e-mail são confirmados em até 2 dias úteis e respondidos em até 15
