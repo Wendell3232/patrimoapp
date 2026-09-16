@@ -29,7 +29,7 @@
 - [x] Editar/arquivar contas e cartões, excluir metas/orçamentos com confirmação
 - [x] Primeiros passos obrigatórios, renda mensal e barra inferior no celular
 - [x] Cadastro ativa a conta na hora (sem e-mail de confirmação)
-- [x] Retorno do login com Google em página própria (/auth-callback)
+- [x] Login apenas com e-mail e senha (remoção do login Google e rota /auth-callback)
 - [x] Rotinas internas do banco bloqueadas para visitantes não logados
 - [ ] Domínio de e-mail próprio (necessário para e-mails com sua marca e recuperação de senha confiável)
 
