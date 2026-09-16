@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Calendar, Lock, User as UserIcon } from "lucide-react";
+import { Calendar, Eye, EyeOff, Lock, User as UserIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/app/AppShell";
@@ -36,6 +36,34 @@ function Perfil() {
 
   const [name, setName] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [savingPassword, setSavingPassword] = useState(false);
+
+  async function updatePassword() {
+    const value = password.trim();
+    if (value.length < 8) {
+      toast.error("A nova senha precisa ter ao menos 8 caracteres.");
+      return;
+    }
+    if (value.length > 72) {
+      toast.error("A senha pode ter no máximo 72 caracteres.");
+      return;
+    }
+    setSavingPassword(true);
+    const { error } = await supabase.auth.updateUser({ password: value });
+    setSavingPassword(false);
+    if (error) {
+      toast.error(
+        error.message.toLowerCase().includes("different")
+          ? "A nova senha precisa ser diferente da atual."
+          : "Não foi possível alterar a senha agora. Tente novamente.",
+      );
+      return;
+    }
+    setPassword("");
+    toast.success("Senha atualizada. Use-a no próximo login.");
+  }
 
   async function save() {
     if (!data) return;
@@ -100,6 +128,46 @@ function Perfil() {
 
             <Button onClick={() => void save()} disabled={saving} size="sm">
               {saving ? "Salvando..." : "Salvar"}
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Lock className="h-5 w-5 text-primary" /> Senha e acesso
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="senha">Senha</Label>
+              <div className="relative">
+                <Input
+                  id="senha"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  placeholder="••••••••"
+                  maxLength={72}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Sua senha fica protegida por criptografia e não pode ser recuperada — defina uma
+                nova aqui para continuar usando no login.
+              </p>
+            </div>
+            <Button onClick={() => void updatePassword()} disabled={savingPassword} size="sm">
+              {savingPassword ? "Salvando..." : "Alterar senha"}
             </Button>
           </CardContent>
         </Card>

@@ -292,7 +292,6 @@ Gerado no Patrimo Brasil`;
   return (
     <AppShell
       title="Relatórios"
-      description="Investigue seus números, compare períodos e analise tendências"
       actions={
         <div className="flex flex-wrap items-center gap-2">
           <Button size="sm" variant="outline" onClick={copyTextSummary} title="Copiar resumo textual">

@@ -16,7 +16,7 @@ import {
 
 import { AppShell } from "@/components/app/AppShell";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { analyzeFinanceQuery } from "@/lib/agent-engine";
@@ -231,10 +231,7 @@ function Agente() {
   }
 
   return (
-    <AppShell
-      title="Agente Financeiro"
-      description="Assistente inteligente com explicações acolhedoras sobre os seus números"
-    >
+    <AppShell title="Agente Financeiro">
       <div className="space-y-6">
         {/* RESUMO RÁPIDO DO MÊS */}
         <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
@@ -311,9 +308,6 @@ function Agente() {
               <CardTitle className="text-base flex items-center gap-2">
                 <MessageSquare className="h-4 w-4 text-primary" /> Faça uma pergunta ao Agente
               </CardTitle>
-              <CardDescription className="text-xs">
-                O Agente analisa seus dados reais e responde em linguagem simples, sem jargões técnicos.
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Chips de perguntas sugeridas */}
@@ -382,9 +376,6 @@ function Agente() {
               <CardTitle className="text-base flex items-center gap-2">
                 <Bot className="h-4 w-4 text-primary" /> Resposta do Agente
               </CardTitle>
-              <CardDescription className="text-xs">
-                Explicações acolhedoras baseadas nas suas contas, cartões e movimentações reais.
-              </CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
               {pending ? (

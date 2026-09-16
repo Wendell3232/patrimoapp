@@ -94,7 +94,6 @@ function Notificacoes() {
   return (
     <AppShell
       title="Notificações"
-      description="Avisos sobre orçamentos, faturas e compromissos em tempo real"
       actions={
         unreadCount > 0 ? (
           <Button size="sm" variant="outline" onClick={() => void markAllRead()}>

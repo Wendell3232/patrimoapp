@@ -248,7 +248,6 @@ function Orcamentos() {
   return (
     <AppShell
       title="Orçamentos"
-      description="Controle seus gastos planejados para evitar surpresas no fim do mês"
       actions={
         <div className="flex items-center gap-2">
           <Button
@@ -298,7 +297,7 @@ function Orcamentos() {
                   <CurrencyInput
                     id="limit-amount"
                     value={limit}
-                    onChange={setLimit}
+                    onValueChange={setLimit}
                     placeholder="0,00"
                   />
                 </div>
@@ -619,7 +618,7 @@ function Orcamentos() {
                 <CurrencyInput
                   id="edit-limit-amount"
                   value={editLimit}
-                  onChange={setEditLimit}
+                  onValueChange={setEditLimit}
                 />
               </div>
 

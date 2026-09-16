@@ -271,7 +271,7 @@ function Dashboard() {
 
   if (data.accounts.length === 0) {
     return (
-      <AppShell title="Visão geral" description="Vamos preparar seu espaço financeiro">
+      <AppShell title="Visão geral">
         <Card className="mx-auto max-w-lg">
           <CardContent className="space-y-4 p-8 text-center">
             <Wallet className="mx-auto h-8 w-8 text-primary" />
@@ -293,7 +293,7 @@ function Dashboard() {
   const showAttention = view.nextAttention.type !== "ok";
 
   return (
-    <AppShell title="Visão geral" description="Resumo das suas finanças" actions={null}>
+    <AppShell title="Visão geral" actions={null}>
       <div className="space-y-6">
         {/* Seletor de período e Ações Rápidas */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

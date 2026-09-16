@@ -263,10 +263,7 @@ function Configuracoes() {
   }
 
   return (
-    <AppShell
-      title="Configurações"
-      description="Personalize categorias, prazos de alertas, preferências e dados do sistema"
-    >
+    <AppShell title="Configurações">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4 sm:w-auto sm:inline-flex">
           <TabsTrigger value="categorias">Categorias</TabsTrigger>

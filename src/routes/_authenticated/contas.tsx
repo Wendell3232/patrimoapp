@@ -213,7 +213,6 @@ function Contas() {
   return (
     <AppShell
       title="Contas"
-      description="Veja onde seu dinheiro está e quanto realmente está disponível"
       actions={
         <div className="flex items-center gap-2">
           <QuickActions compact />
@@ -272,7 +271,7 @@ function Contas() {
                   <CurrencyInput
                     id="acc-balance"
                     value={balance}
-                    onChange={setBalance}
+                    onValueChange={setBalance}
                     placeholder="0,00"
                   />
                 </div>
@@ -591,7 +590,7 @@ function Contas() {
                 <CurrencyInput
                   id="edit-acc-bal"
                   value={editBalance}
-                  onChange={setEditBalance}
+                  onValueChange={setEditBalance}
                 />
               </div>
 

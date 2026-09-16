@@ -20,7 +20,7 @@ import { AppShell } from "@/components/app/AppShell";
 import { CurrencyInput } from "@/components/app/CurrencyInput";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -305,7 +305,6 @@ function ContasFuturas() {
   return (
     <AppShell
       title="Contas futuras"
-      description="Enxergue os próximos meses, antecipe saídas e acompanhe o saldo projetado"
       actions={
         <Dialog open={openCreate} onOpenChange={setOpenCreate}>
           <DialogTrigger asChild>
@@ -351,7 +350,7 @@ function ContasFuturas() {
                   <CurrencyInput
                     id="c-val"
                     value={newAmount}
-                    onChange={setNewAmount}
+                    onValueChange={setNewAmount}
                     placeholder="0,00"
                   />
                 </div>

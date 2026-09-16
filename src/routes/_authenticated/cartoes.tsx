@@ -294,7 +294,6 @@ function Cartoes() {
   return (
     <AppShell
       title="Cartões"
-      description="Acompanhe sua fatura atual, vencimento e limite em tempo real"
       actions={
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
@@ -336,7 +335,7 @@ function Cartoes() {
                 <CurrencyInput
                   id="card-limit"
                   value={limit}
-                  onChange={setLimit}
+                  onValueChange={setLimit}
                   placeholder="0,00"
                 />
               </div>
@@ -619,7 +618,7 @@ function Cartoes() {
                 <CurrencyInput
                   id="pay-amount"
                   value={payAmount}
-                  onChange={setPayAmount}
+                  onValueChange={setPayAmount}
                   placeholder="0,00"
                 />
               </div>
@@ -782,7 +781,7 @@ function Cartoes() {
                 <CurrencyInput
                   id="edit-card-limit"
                   value={editLimit}
-                  onChange={setEditLimit}
+                  onValueChange={setEditLimit}
                 />
               </div>
 

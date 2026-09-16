@@ -277,7 +277,6 @@ function Metas() {
   return (
     <AppShell
       title="Metas"
-      description="Veja o progresso, quanto guardar por mês e a viabilidade dos seus objetivos"
       actions={
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
@@ -309,7 +308,7 @@ function Metas() {
                 <CurrencyInput
                   id="goal-target"
                   value={target}
-                  onChange={setTarget}
+                  onValueChange={setTarget}
                   placeholder="0,00"
                 />
               </div>
@@ -319,7 +318,7 @@ function Metas() {
                 <CurrencyInput
                   id="goal-current"
                   value={current}
-                  onChange={setCurrent}
+                  onValueChange={setCurrent}
                   placeholder="0,00"
                 />
               </div>
@@ -570,7 +569,7 @@ function Metas() {
                 <CurrencyInput
                   id="dep-amount"
                   value={depositAmount}
-                  onChange={setDepositAmount}
+                  onValueChange={setDepositAmount}
                   placeholder="0,00"
                 />
               </div>
@@ -655,7 +654,7 @@ function Metas() {
                 <CurrencyInput
                   id="edit-goal-target"
                   value={editTarget}
-                  onChange={setEditTarget}
+                  onValueChange={setEditTarget}
                 />
               </div>
 

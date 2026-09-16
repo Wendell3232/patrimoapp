@@ -345,10 +345,7 @@ function Movimentacoes() {
   );
 
   return (
-    <AppShell
-      title="Movimentações"
-      description="Consulte, filtre e organize suas entradas e saídas com facilidade"
-    >
+    <AppShell title="Movimentações">
       <div className="space-y-6">
         {/* Ações Rápidas no topo */}
         <QuickActions />
@@ -638,7 +635,7 @@ function Movimentacoes() {
                 <CurrencyInput
                   id="edit-amount"
                   value={editAmount}
-                  onChange={setEditAmount}
+                  onValueChange={setEditAmount}
                   placeholder="0,00"
                 />
               </div>
