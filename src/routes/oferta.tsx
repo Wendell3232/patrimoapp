@@ -1,42 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  Bell,
-  Check,
-  CreditCard,
-  FileDown,
-  LineChart,
-  Lock,
-  MessagesSquare,
-  Moon,
-  PieChart,
-  PiggyBank,
-  ShieldCheck,
-  Sparkles,
-  Target,
-  Wallet,
-  X,
-} from "lucide-react";
+import type { ReactNode } from "react";
 
-import { ThemeToggle } from "@/components/app/ThemeToggle";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { CHECKOUT_URL, PRICE_LABEL } from "@/lib/sales";
 
 export const Route = createFileRoute("/oferta")({
   head: () => ({
     meta: [
-      { title: "Patrimo — Organize suas finanças por R$ 37,90 (pagamento único)" },
+      { title: "Patrimo — clareza para o seu dinheiro" },
       {
         name: "description",
-        content:
-          "Controle contas, cartões, metas e orçamentos em reais, com patrimônio contínuo. Pagamento único de R$ 37,90 com acesso vitalício.",
+        content: `Patrimo: organize suas finanças pessoais com contas, cartões, metas e relatórios claros. Pagamento único de ${PRICE_LABEL}.`,
       },
-      { property: "og:title", content: "Patrimo — Organize suas finanças por R$ 37,90" },
+      {
+        property: "og:title",
+        content: "Patrimo — clareza para o seu dinheiro",
+      },
       {
         property: "og:description",
-        content:
-          "Patrimônio contínuo, faturas de cartão, compromissos futuros e metas em um só lugar. Pagamento único, acesso vitalício.",
+        content: `Patrimo: organize suas finanças pessoais com contas, cartões, metas e relatórios claros. Pagamento único de ${PRICE_LABEL}.`,
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -45,453 +26,432 @@ export const Route = createFileRoute("/oferta")({
   component: Oferta,
 });
 
-const NAV = [
-  { href: "#produto", label: "Produto" },
-  { href: "#como-funciona", label: "Como funciona" },
-  { href: "#recursos", label: "Recursos" },
-  { href: "#preco", label: "Preço" },
-  { href: "#duvidas", label: "Dúvidas" },
-];
+const CSS = `
+.pl { --ink:#17212b; --muted:#66717d; --line:#e6e9ed; --paper:#ffffff; --canvas:#f8faf9; --green:#2869ed; --green-deep:#174fbe; --green-pale:#edf3ff; --blue:#2869ed; --shadow:0 20px 50px rgba(26,37,48,.09); font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; -webkit-font-smoothing:antialiased; background:var(--paper); color:var(--ink); }
+html { scroll-behavior: smooth; }
+.pl a { color: inherit; text-decoration: none; }
+.pl .wrap { width:min(1120px, calc(100% - 48px)); margin:0 auto; }
+.pl .notice { background:#174fbe; color:#fff; font-size:13px; padding:11px 0; text-align:center; }
+.pl header { height:74px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); }
+.pl .brand { display:inline-flex; align-items:center; gap:10px; font-weight:750; letter-spacing:-.03em; font-size:19px; }
+.pl .mark { display:grid; place-items:center; width:28px; height:28px; border-radius:8px; background:var(--green); color:#fff; font-size:15px; font-weight:800; }
+.pl nav { display:flex; gap:28px; align-items:center; color:var(--muted); font-size:14px; }
+.pl .login { color:var(--ink); font-weight:600; }
+.pl .button { display:inline-flex; align-items:center; justify-content:center; gap:9px; min-height:48px; padding:0 20px; border-radius:9px; background:var(--green); color:#fff; font-weight:700; font-size:15px; transition:.2s ease; }
+.pl .button:hover { background:var(--green-deep); transform:translateY(-1px); }
+.pl .button.light { background:#fff; color:var(--ink); border:1px solid var(--line); }
+.pl .button.light:hover { background:#f5f7f6; }
+.pl .button.small { min-height:38px; padding:0 14px; font-size:14px; }
+.pl .hero { padding:92px 0 76px; background:linear-gradient(180deg,#fbfdfc 0%,#fff 100%); overflow:hidden; }
+.pl .hero-grid { display:grid; grid-template-columns:.96fr 1.04fr; align-items:center; gap:70px; }
+.pl .eyebrow { display:inline-flex; align-items:center; gap:8px; color:var(--green-deep); background:var(--green-pale); border-radius:999px; padding:7px 11px; font-size:13px; font-weight:700; }
+.pl .eyebrow i { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--green); }
+.pl h1 { max-width:640px; margin:18px 0; font-size:clamp(42px,5.1vw,66px); line-height:1.03; letter-spacing:-.065em; }
+.pl .lead { max-width:530px; color:var(--muted); font-size:18px; line-height:1.6; }
+.pl .hero-actions { display:flex; gap:12px; margin-top:29px; }
+.pl .microcopy { margin:13px 0 0; color:var(--muted); font-size:13px; }
+.pl .checkline { display:flex; flex-wrap:wrap; gap:16px; margin-top:29px; color:#3e4a54; font-size:13px; }
+.pl .checkline span::before { content:"✓"; color:var(--green); font-weight:800; margin-right:6px; }
+.pl .app-window { background:#fff; border:1px solid #dce4e0; border-radius:16px; box-shadow:var(--shadow); overflow:hidden; transform:rotate(1.5deg); }
+.pl .app-top { height:44px; display:flex; align-items:center; gap:6px; padding:0 16px; background:#f6f8f7; border-bottom:1px solid var(--line); }
+.pl .dot { width:8px; height:8px; border-radius:50%; background:#d2d9d5; }
+.pl .app-body { display:grid; grid-template-columns:145px 1fr; min-height:365px; }
+.pl .sidebar { padding:18px 13px; border-right:1px solid var(--line); color:#78828a; font-size:11px; }
+.pl .side-brand { margin:0 0 22px 5px; color:var(--ink); font-size:14px; font-weight:800; }
+.pl .side-item { padding:8px 8px; margin-bottom:5px; border-radius:6px; }
+.pl .side-item.active { background:var(--green-pale); color:var(--green-deep); font-weight:700; }
+.pl .dashboard { padding:24px 25px; }
+.pl .dashboard-head { display:flex; justify-content:space-between; align-items:start; }
+.pl .dashboard h3 { margin:0 0 4px; font-size:16px; letter-spacing:-.03em; }
+.pl .dashboard small { color:#86909a; }
+.pl .avatar { width:24px; height:24px; border-radius:50%; background:#dff0e9; }
+.pl .balance { margin:25px 0 20px; font-size:25px; font-weight:760; letter-spacing:-.05em; }
+.pl .balance span { display:block; margin-bottom:5px; font-size:10px; letter-spacing:0; color:#7c878f; font-weight:600; text-transform:uppercase; }
+.pl .chart { display:flex; align-items:end; gap:8px; height:86px; padding:12px; background:#f7faf8; border-radius:9px; }
+.pl .bar { width:14%; background:#b9dfd0; border-radius:4px 4px 0 0; }
+.pl .bar:last-child { background:var(--green); }
+.pl .cards { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:13px; }
+.pl .mini-card { padding:12px; border:1px solid var(--line); border-radius:8px; }
+.pl .mini-card b { display:block; margin-top:7px; font-size:13px; }
+.pl .mini-card span { color:#7c878f; font-size:10px; }
+.pl section { padding:96px 0; }
+.pl .section-label { color:var(--green); font-size:13px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+.pl h2 { max-width:650px; margin:10px 0 16px; font-size:clamp(32px,4vw,48px); letter-spacing:-.055em; line-height:1.08; }
+.pl .section-lead { max-width:600px; color:var(--muted); font-size:17px; line-height:1.6; }
+.pl .outcomes { padding-top:44px; display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+.pl .outcome { padding:24px 0; border-top:1px solid var(--line); }
+.pl .number { color:var(--green); font-size:13px; font-weight:800; }
+.pl .outcome h3 { margin:17px 0 8px; font-size:19px; letter-spacing:-.035em; }
+.pl .outcome p { margin:0; color:var(--muted); line-height:1.55; font-size:15px; }
+.pl .soft { background:#f4f7ff; }
+.pl .included { display:grid; grid-template-columns:.84fr 1.16fr; gap:70px; align-items:start; }
+.pl .feature-list { border-top:1px solid var(--line); }
+.pl .feature { display:grid; grid-template-columns:34px 1fr; gap:14px; padding:19px 0; border-bottom:1px solid var(--line); }
+.pl .feature-icon { display:grid; place-items:center; width:30px; height:30px; border-radius:8px; background:var(--green-pale); color:var(--green); font-weight:800; }
+.pl .feature strong { display:block; margin-bottom:4px; font-size:15px; }
+.pl .feature span { color:var(--muted); font-size:14px; line-height:1.5; }
+.pl .how { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:48px; }
+.pl .step { padding:25px; min-height:206px; border:1px solid var(--line); border-radius:12px; background:#fff; }
+.pl .step-n { color:var(--green); font-size:13px; font-weight:800; }
+.pl .step h3 { margin:34px 0 8px; font-size:19px; letter-spacing:-.03em; }
+.pl .step p { margin:0; color:var(--muted); font-size:14px; line-height:1.55; }
+.pl .honest { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:44px; }
+.pl .honest-card { padding:28px; border-radius:12px; background:#fff; border:1px solid var(--line); }
+.pl .honest-card h3 { margin:0 0 15px; font-size:19px; letter-spacing:-.035em; }
+.pl .honest-card ul { margin:0; padding:0; list-style:none; }
+.pl .honest-card li { position:relative; padding:8px 0 8px 23px; color:var(--muted); line-height:1.45; font-size:14px; }
+.pl .honest-card li::before { content:"✓"; position:absolute; left:0; color:var(--green); font-weight:800; }
+.pl .honest-card.no li::before { content:"—"; color:#8b959d; }
+.pl .privacy { display:grid; grid-template-columns:.85fr 1.15fr; gap:70px; align-items:center; }
+.pl .privacy-points { display:grid; gap:17px; }
+.pl .privacy-points div { padding:16px 0; border-bottom:1px solid var(--line); }
+.pl .privacy-points b { display:block; margin-bottom:5px; font-size:15px; }
+.pl .privacy-points p { margin:0; color:var(--muted); font-size:14px; line-height:1.5; }
+.pl .price-box { max-width:650px; margin:0 auto; text-align:center; border:1px solid #cfe7dc; border-radius:16px; padding:52px 32px; background:linear-gradient(135deg,#f0faf5,#fff); }
+.pl .price-box h2 { margin:10px auto 7px; }
+.pl .price { margin:20px 0 7px; font-size:58px; font-weight:800; letter-spacing:-.07em; }
+.pl .price-sub { color:var(--muted); font-size:15px; }
+.pl .price-box .button { min-width:260px; margin-top:27px; }
+.pl .guarantee { margin-top:18px; color:var(--muted); font-size:13px; }
+.pl .faq { max-width:760px; margin:38px auto 0; }
+.pl details { padding:19px 0; border-bottom:1px solid var(--line); }
+.pl summary { cursor:pointer; font-weight:700; font-size:16px; list-style:none; }
+.pl summary::after { content:"+"; float:right; color:var(--green); font-size:21px; font-weight:400; }
+.pl details[open] summary::after { content:"−"; }
+.pl details p { max-width:680px; margin:13px 0 0; color:var(--muted); font-size:14px; line-height:1.6; }
+.pl footer { padding:32px 0 44px; border-top:1px solid var(--line); color:var(--muted); font-size:13px; }
+.pl .footer-row { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+.pl .footer-links { display:flex; gap:18px; }
+@media (max-width:760px) {
+  .pl .wrap { width:min(100% - 34px, 560px); }
+  .pl header { height:64px; }
+  .pl nav { display:none; }
+  .pl .hero { padding:64px 0 54px; }
+  .pl .hero-grid, .pl .included, .pl .privacy { grid-template-columns:1fr; gap:42px; }
+  .pl .hero-copy { text-align:center; }
+  .pl h1 { font-size:45px; }
+  .pl .lead { font-size:16px; }
+  .pl .hero-actions { flex-direction:column; }
+  .pl .checkline { justify-content:center; gap:9px 16px; }
+  .pl .app-window { max-width:470px; margin:0 auto; transform:none; }
+  .pl .app-body { grid-template-columns:100px 1fr; min-height:316px; }
+  .pl .sidebar { padding:16px 8px; }
+  .pl .dashboard { padding:20px 16px; }
+  .pl section { padding:68px 0; }
+  .pl .outcomes, .pl .how, .pl .honest { grid-template-columns:1fr; }
+  .pl .outcomes { gap:0; }
+  .pl .how { margin-top:32px; }
+  .pl .price { font-size:50px; }
+  .pl .price-box { padding:40px 20px; }
+  .pl .price-box .button { min-width:100%; }
+  .pl .footer-row { align-items:flex-start; flex-direction:column; }
+}
+`;
 
-const TRUST = [
-  { icon: Check, label: `Pagamento único de ${PRICE_LABEL}` },
-  { icon: ShieldCheck, label: "LGPD · dados protegidos" },
-  { icon: Lock, label: "Sem conexão com bancos" },
-  { icon: Sparkles, label: "Acesso vitalício com atualizações" },
-];
-
-const WITHOUT = [
-  "Planilha para atualizar toda semana",
-  "Horas perdidas organizando números",
-  "Dinheiro some sem você saber para onde foi",
-  "Susto no fechamento do mês",
-];
-
-const WITH = [
-  "Registrado em segundos, sem planilha",
-  "Saldo acompanha a virada do mês automaticamente",
-  "Relatórios mostram para onde o dinheiro foi",
-  "Fechamento tranquilo, todo mês",
-];
-
-const STEPS = [
-  {
-    number: "01",
-    title: "Compre",
-    text: `Faça o pagamento único de ${PRICE_LABEL} com PIX, cartão ou boleto.`,
-  },
-  {
-    number: "02",
-    title: "Receba o código",
-    text: "Assim que o pagamento confirmar, você recebe um código de licença.",
-  },
-  {
-    number: "03",
-    title: "Crie sua conta e ative",
-    text: "Crie sua conta gratuita, cole o código na tela de ativação e pronto: acesso vitalício.",
-  },
-];
-
-const FEATURES = [
-  {
-    icon: Wallet,
-    title: "Contas e patrimônio",
-    text: "Acompanhe seus saldos e veja seu patrimônio evoluir mês a mês, com o saldo seguindo para o mês seguinte.",
-  },
-  {
-    icon: CreditCard,
-    title: "Cartões e faturas",
-    text: "Compras parceladas entram no cartão uma a uma e aparecem como compromissos futuros.",
-  },
-  {
-    icon: PiggyBank,
-    title: "Metas financeiras",
-    text: "Reserva de emergência, viagem, entrada do carro: acompanhe o progresso em reais e a previsão de conclusão.",
-  },
-  {
-    icon: LineChart,
-    title: "Relatórios claros",
-    text: "Entradas, saídas e sobras do período em gráficos simples. Você entende para onde seu dinheiro vai.",
-  },
-  {
-    icon: Target,
-    title: "Orçamentos",
-    text: "Defina limites por categoria e veja, mês a mês, se está dentro do planejado.",
-  },
-  {
-    icon: Bell,
-    title: "Notificações",
-    text: "Receba lembretes e avisos relacionados às suas finanças sem bagunçar sua tela.",
-  },
-  {
-    icon: MessagesSquare,
-    title: "Assistente financeiro",
-    text: "Pergunte e receba resumos e orientações sobre os seus números, baseados nos seus próprios dados.",
-  },
-  {
-    icon: FileDown,
-    title: "Exportação dos seus dados",
-    text: "Leve seus dados com você: exportação em JSON direto do app, quando quiser.",
-  },
-  {
-    icon: Moon,
-    title: "Tema claro e escuro",
-    text: "Use no celular, tablet ou computador, com o visual que você prefere.",
-  },
-];
-
-const PRIVACY = [
-  {
-    title: "Sem Open Finance",
-    text: "Não conectamos no seu banco e nunca pedimos a senha do seu banco. Você lança manualmente.",
-  },
-  {
-    title: "LGPD",
-    text: "Tratamos seus dados conforme a Lei nº 13.709/2018, com direitos garantidos.",
-  },
-  {
-    title: "Isolado por usuário",
-    text: "Cada pessoa acessa apenas os próprios dados. Nada de dados de terceiros.",
-  },
-  {
-    title: "Zero anúncios",
-    text: "Não vendemos dados e não usamos seus números para rastreamento de publicidade.",
-  },
-];
-
-const AI_PROMPS = [
-  "Quanto gastei em restaurantes este mês?",
-  "Onde posso cortar gastos?",
-  "Quando vou atingir minha meta?",
-];
-
-const FAQ = [
-  {
-    q: "Preciso pagar todos os meses?",
-    a: "Não. Você paga R$ 37,90 uma única vez e tem acesso vitalício, incluindo todas as atualizações futuras. Não há assinatura, renovação ou cobrança recorrente.",
-  },
-  {
-    q: "Como recebo o acesso?",
-    a: "Após a confirmação do pagamento, você recebe um código de licença. Basta criar sua conta no app e colar o código na tela de ativação.",
-  },
-  {
-    q: "Quais formas de pagamento?",
-    a: "PIX (aprovação imediata), cartão de crédito e boleto, direto na página de checkout.",
-  },
-  {
-    q: "E se eu não gostar?",
-    a: "Você tem 7 dias de garantia. Se o produto não servir, devolvemos seu dinheiro.",
-  },
-  {
-    q: "Meus dados ficam seguros?",
-    a: "Sim. Não conectamos com o seu banco, cada pessoa acessa apenas os próprios dados e o tratamento segue a LGPD. Veja a Política de Privacidade no rodapé.",
-  },
-];
-
-function BuyButton({ big = true }: { big?: boolean }) {
+function Cta({ children }: { children: ReactNode }) {
   if (!CHECKOUT_URL.startsWith("http")) {
     return (
-      <Button size={big ? "lg" : "default"} disabled>
+      <span className="button" style={{ opacity: 0.6, cursor: "not-allowed" }}>
         Link de pagamento em breve
-      </Button>
+      </span>
     );
   }
   return (
-    <Button asChild size={big ? "lg" : "default"}>
-      <a href={CHECKOUT_URL} target="_blank" rel="noreferrer">
-        Garantir acesso por {PRICE_LABEL}
-        {big && <ArrowRight className="ml-2 h-4 w-4" />}
-      </a>
-    </Button>
+    <a className="button" href={CHECKOUT_URL} rel="noreferrer">
+      {children}
+    </a>
   );
 }
 
 function Oferta() {
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-6">
-          <Link to="/" className="flex items-center gap-3 font-display text-xl font-semibold">
-            <span className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
-              P
-            </span>
-            Patrimo
-          </Link>
-          <nav className="hidden items-center gap-6 text-sm text-muted-foreground lg:flex">
-            {NAV.map((item) => (
-              <a key={item.href} href={item.href} className="transition-colors hover:text-foreground">
-                {item.label}
-              </a>
-            ))}
-          </nav>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <Button asChild variant="outline" size="sm">
-              <Link to="/auth">Entrar</Link>
-            </Button>
-            <span className="hidden sm:inline-flex">
-              <BuyButton big={false} />
-            </span>
-          </div>
-        </div>
+    <div className="pl">
+      <style>{CSS}</style>
+      <div className="notice">Seu dinheiro mais claro. Sua rotina mais leve.</div>
+      <header className="wrap">
+        <a className="brand" href="#inicio" aria-label="Patrimo, início">
+          <span className="mark">P</span>Patrimo
+        </a>
+        <nav aria-label="Navegação principal">
+          <a href="#recebe">O que você recebe</a>
+          <a href="#como-funciona">Como funciona</a>
+          <a href="#duvidas">Dúvidas</a>
+        </nav>
+        <Link className="login" to="/auth">
+          Entrar
+        </Link>
       </header>
 
-      <main>
-        <section className="text-center" id="produto">
-          <div className="mx-auto max-w-3xl px-6 pb-14 pt-16 sm:pt-24">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
-              <Sparkles className="h-3.5 w-3.5" />
-              Gerenciador financeiro pessoal
-            </span>
-            <h1 className="mt-6 font-display text-4xl font-semibold leading-tight sm:text-5xl">
-              Saiba para onde vai cada real.
-            </h1>
-            <p className="mx-auto mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
-              Contas, cartões, metas e orçamentos em reais — sem planilha e sem dar a senha do seu
-              banco. Acesso vitalício por um único pagamento.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <BuyButton />
-              <Button asChild size="lg" variant="outline">
-                <a href="#como-funciona">
-                  Ver como funciona
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
-              </Button>
-            </div>
-            <ul className="mx-auto mt-8 flex max-w-2xl flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-              {TRUST.map((item) => (
-                <li key={item.label} className="flex items-center gap-1.5">
-                  <item.icon className="h-4 w-4 text-positive" />
-                  {item.label}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        <section className="border-t border-border bg-card/40 px-6 py-14">
-          <div className="mx-auto max-w-5xl">
-            <h2 className="text-center font-display text-2xl font-semibold sm:text-3xl">
-              Imagine fechar o mês sem estresse.
-            </h2>
-            <div className="mt-10 grid gap-4 sm:grid-cols-2">
-              <Card>
-                <CardContent className="p-6">
-                  <p className="font-semibold text-muted-foreground">Sem o Patrimo</p>
-                  <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
-                    {WITHOUT.map((item) => (
-                      <li key={item} className="flex items-start gap-2">
-                        <X className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground/60" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-              <Card className="border-positive/40">
-                <CardContent className="p-6">
-                  <p className="font-semibold text-positive">Com o Patrimo</p>
-                  <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
-                    {WITH.map((item) => (
-                      <li key={item} className="flex items-start gap-2">
-                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-positive" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-4xl px-6 py-14" id="como-funciona">
-          <h2 className="text-center font-display text-2xl font-semibold sm:text-3xl">
-            Como funciona em 3 passos
-          </h2>
-          <div className="mt-10 grid gap-4 sm:grid-cols-3">
-            {STEPS.map((step) => (
-              <Card key={step.number}>
-                <CardContent className="space-y-3 p-6">
-                  <p className="font-display text-3xl font-bold text-primary">{step.number}</p>
-                  <p className="font-semibold">{step.title}</p>
-                  <p className="text-sm text-muted-foreground">{step.text}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        <section className="border-t border-border bg-card/40 px-6 py-14" id="recursos">
-          <div className="mx-auto max-w-6xl">
-            <h2 className="text-center font-display text-2xl font-semibold sm:text-3xl">
-              Tudo incluído. Sem esconder nada.
-            </h2>
-            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {FEATURES.map((feature) => (
-                <Card key={feature.title}>
-                  <CardContent className="space-y-3 p-6">
-                    <feature.icon className="h-6 w-6 text-primary" />
-                    <p className="font-semibold">{feature.title}</p>
-                    <p className="text-sm text-muted-foreground">{feature.text}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-5xl px-6 py-14" id="privacidade">
-          <h2 className="text-center font-display text-2xl font-semibold sm:text-3xl">
-            Privacidade que é princípio, não recurso.
-          </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-center text-sm text-muted-foreground">
-            Você lança seus dados manualmente — seus números ficam só seus: isolados, sem anúncio e
-            tratados conforme a LGPD.
-          </p>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {PRIVACY.map((item) => (
-              <Card key={item.title}>
-                <CardContent className="space-y-3 p-5">
-                  <ShieldCheck className="h-6 w-6 text-primary" />
-                  <p className="font-semibold">{item.title}</p>
-                  <p className="text-sm text-muted-foreground">{item.text}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          <div className="mt-8 text-center">
-            <Button asChild variant="outline">
-              <Link to="/privacidade">Ver nossa Política de Privacidade</Link>
-            </Button>
-          </div>
-        </section>
-
-        <section className="border-t border-border bg-card/40 px-6 py-14">
-          <div className="mx-auto grid max-w-5xl items-center gap-10 sm:grid-cols-2">
-            <div>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
-                <MessagesSquare className="h-3.5 w-3.5" />
-                Assistente financeiro
+      <main id="inicio">
+        <section className="hero">
+          <div className="wrap hero-grid">
+            <div className="hero-copy">
+              <span className="eyebrow">
+                <i />
+                Gerenciador financeiro pessoal
               </span>
-              <h2 className="mt-4 font-display text-2xl font-semibold sm:text-3xl">
-                Pergunte qualquer coisa sobre o seu dinheiro.
-              </h2>
-              <p className="mt-3 text-sm text-muted-foreground">
-                O assistente responde com base nos seus próprios dados, explicando em português
-                claro — e nada sai da sua conta.
+              <h1>Clareza para cuidar melhor do seu dinheiro.</h1>
+              <p className="lead">
+                Contas, cartões, metas e orçamento em um só lugar. Veja para onde seu dinheiro vai e
+                termine o mês com mais tranquilidade.
               </p>
-              <div className="mt-6 flex flex-wrap gap-2">
-                {AI_PROMPS.map((prompt) => (
-                  <span
-                    key={prompt}
-                    className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground"
-                  >
-                    "{prompt}"
-                  </span>
-                ))}
+              <div className="hero-actions">
+                <Cta>
+                  Começar por {PRICE_LABEL} <span>→</span>
+                </Cta>
+                <a className="button light" href="#recebe">
+                  Ver o que está incluso
+                </a>
+              </div>
+              <p className="microcopy">Pagamento único. Sem assinatura ou renovação automática.</p>
+              <div className="checkline">
+                <span>7 dias de garantia</span>
+                <span>Sem mensalidade</span>
+                <span>Comece em poucos minutos</span>
               </div>
             </div>
-            <div className="space-y-3 text-sm text-muted-foreground">
-              <div className="rounded-xl border border-border bg-card p-5">
-                <p className="font-semibold text-foreground">Resumo instantâneo</p>
-                <p className="mt-1.5">
-                  Entenda entradas, saídas e sobras do período em segundos, sem abrir relatório.
-                </p>
+            <div className="app-window" aria-label="Prévia ilustrativa do aplicativo Patrimo">
+              <div className="app-top">
+                <span className="dot" />
+                <span className="dot" />
+                <span className="dot" />
               </div>
-              <div className="rounded-xl border border-border bg-card p-5">
-                <p className="font-semibold text-foreground">Ensina, não só responde</p>
-                <p className="mt-1.5">
-                  Reserva de emergência, bola de neve, orçamento: o assistente explica no contexto
-                  dos seus números.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-3xl px-6 py-14" id="duvidas">
-          <h2 className="text-center font-display text-2xl font-semibold sm:text-3xl">
-            Ainda na dúvida? A gente responde.
-          </h2>
-          <div className="mt-8 space-y-3">
-            {FAQ.map((item) => (
-              <Card key={item.q}>
-                <CardContent className="p-5">
-                  <p className="font-medium">{item.q}</p>
-                  <p className="mt-1.5 text-sm text-muted-foreground">{item.a}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        <section className="border-t border-border bg-card/40 px-6 py-14" id="preco">
-          <div className="mx-auto max-w-md">
-            <Card>
-              <CardContent className="space-y-4 p-8 text-center">
-                <p className="text-sm text-muted-foreground">Pagamento único</p>
-                <p className="font-display text-6xl font-bold tracking-tight">{PRICE_LABEL}</p>
-                <p className="text-sm text-muted-foreground">
-                  acesso vitalício, sem mensalidade e com atualizações inclusas
-                </p>
-                <ul className="mx-auto grid max-w-xs gap-2 text-left text-sm text-muted-foreground">
-                  {[
-                    "Todos os recursos liberados",
-                    "Sem assinatura e sem renovação",
-                    "Garantia de 7 dias",
-                    "R$ 37,90 é menos do que um lanche",
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-2">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-positive" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex justify-center pt-2">
-                  <BuyButton />
+              <div className="app-body">
+                <aside className="sidebar">
+                  <div className="side-brand">P Patrimo</div>
+                  <div className="side-item active">Visão geral</div>
+                  <div className="side-item">Contas</div>
+                  <div className="side-item">Cartões</div>
+                  <div className="side-item">Metas</div>
+                  <div className="side-item">Relatórios</div>
+                </aside>
+                <div className="dashboard">
+                  <div className="dashboard-head">
+                    <div>
+                      <h3>Olá, Marina</h3>
+                      <small>Visão de setembro</small>
+                    </div>
+                    <span className="avatar" />
+                  </div>
+                  <div className="balance">
+                    <span>Saldo disponível</span>R$ 4.280,00
+                  </div>
+                  <div className="chart">
+                    <div className="bar" style={{ height: "34%" }} />
+                    <div className="bar" style={{ height: "51%" }} />
+                    <div className="bar" style={{ height: "42%" }} />
+                    <div className="bar" style={{ height: "68%" }} />
+                    <div className="bar" style={{ height: "82%" }} />
+                    <div className="bar" style={{ height: "100%" }} />
+                  </div>
+                  <div className="cards">
+                    <div className="mini-card">
+                      <span>Entradas</span>
+                      <b>R$ 6.500</b>
+                    </div>
+                    <div className="mini-card">
+                      <span>Saídas</span>
+                      <b>R$ 2.220</b>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  PIX com aprovação imediata, cartão ou boleto.
-                </p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </section>
 
-        <section className="px-6 py-16 text-center">
-          <h2 className="font-display text-2xl font-semibold sm:text-3xl">
-            Quanto você perdeu esse mês sem saber?
-          </h2>
-          <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-            Não precisa de mais disciplina. Precisa de clareza. Pague uma vez e tenha controle
-            financeiro por toda a vida.
-          </p>
-          <div className="mt-6 flex justify-center">
-            <BuyButton />
+        <section id="recebe">
+          <div className="wrap">
+            <span className="section-label">Do seu jeito</span>
+            <h2>Menos esforço para organizar. Mais contexto para decidir.</h2>
+            <p className="section-lead">
+              O Patrimo reúne os números que hoje ficam espalhados entre anotações, planilhas e
+              memória.
+            </p>
+            <div className="outcomes">
+              <article className="outcome">
+                <span className="number">01</span>
+                <h3>Veja seu mês com clareza</h3>
+                <p>Acompanhe entradas, despesas e saldo sem precisar somar tudo no fim do mês.</p>
+              </article>
+              <article className="outcome">
+                <span className="number">02</span>
+                <h3>Planeje sem adivinhar</h3>
+                <p>Crie metas e orçamentos em reais para transformar intenção em acompanhamento.</p>
+              </article>
+              <article className="outcome">
+                <span className="number">03</span>
+                <h3>Antecipe compromissos</h3>
+                <p>Tenha cartões e compras parceladas visíveis antes de elas virarem surpresa.</p>
+              </article>
+            </div>
           </div>
-          <p className="mt-4 text-xs text-muted-foreground">
-            Garantia de 7 dias: se não servir, devolvemos seu dinheiro.
-          </p>
+        </section>
+
+        <section className="soft">
+          <div className="wrap included">
+            <div>
+              <span className="section-label">O que você recebe</span>
+              <h2>O essencial para acompanhar sua vida financeira.</h2>
+              <p className="section-lead">
+                Tudo já está liberado na mesma licença. Sem planos, bloqueios ou cobrança mensal.
+              </p>
+            </div>
+            <div className="feature-list">
+              <div className="feature">
+                <span className="feature-icon">01</span>
+                <div>
+                  <strong>Contas, saldos e patrimônio</strong>
+                  <span>Registre onde seu dinheiro está e acompanhe sua evolução ao longo do tempo.</span>
+                </div>
+              </div>
+              <div className="feature">
+                <span className="feature-icon">02</span>
+                <div>
+                  <strong>Cartões e compras parceladas</strong>
+                  <span>Organize faturas e veja compromissos futuros antes do fechamento.</span>
+                </div>
+              </div>
+              <div className="feature">
+                <span className="feature-icon">03</span>
+                <div>
+                  <strong>Metas e orçamentos</strong>
+                  <span>Defina um destino para o dinheiro e acompanhe o avanço em valores reais.</span>
+                </div>
+              </div>
+              <div className="feature">
+                <span className="feature-icon">04</span>
+                <div>
+                  <strong>Relatórios simples</strong>
+                  <span>Entenda suas entradas, saídas e categorias sem montar fórmulas.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="como-funciona">
+          <div className="wrap">
+            <span className="section-label">Comece em poucos minutos</span>
+            <h2>Um processo simples, sem surpresa depois da compra.</h2>
+            <div className="how">
+              <article className="step">
+                <span className="step-n">01</span>
+                <h3>Escolha sua licença</h3>
+                <p>Faça um único pagamento por PIX, cartão ou boleto, pelo checkout seguro.</p>
+              </article>
+              <article className="step">
+                <span className="step-n">02</span>
+                <h3>Receba seu código</h3>
+                <p>Depois da confirmação, seu código de licença chega para a ativação.</p>
+              </article>
+              <article className="step">
+                <span className="step-n">03</span>
+                <h3>Crie sua conta</h3>
+                <p>Ative o acesso, cadastre suas primeiras contas e comece pelo que já importa para você.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section className="soft">
+          <div className="wrap">
+            <span className="section-label">Para a sua rotina</span>
+            <h2>Você não precisa ser especialista em finanças para se sentir no controle.</h2>
+            <p className="section-lead">
+              Comece pelo que já faz parte da sua vida. O Patrimo organiza os números para você
+              enxergar suas escolhas com mais calma.
+            </p>
+            <div className="honest">
+              <article className="honest-card">
+                <h3>Quando o dinheiro fica visível</h3>
+                <ul>
+                  <li>Fica mais fácil decidir se cabe uma compra agora.</li>
+                  <li>Você acompanha suas metas sem perder o ânimo no caminho.</li>
+                  <li>O fechamento do mês deixa de ser uma surpresa.</li>
+                </ul>
+              </article>
+              <article className="honest-card">
+                <h3>Feito para ser simples</h3>
+                <ul>
+                  <li>Visual limpo, em celular, tablet ou computador.</li>
+                  <li>Registros rápidos, sem planilhas complicadas.</li>
+                  <li>Tudo o que você precisa, sem pagar de novo todo mês.</li>
+                </ul>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section className="soft" id="preco">
+          <div className="wrap">
+            <div className="price-box">
+              <span className="section-label">Licença individual</span>
+              <h2>Organize sua vida financeira com um único pagamento.</h2>
+              <div className="price">{PRICE_LABEL}</div>
+              <p className="price-sub">Sem mensalidade e sem renovação automática.</p>
+              <Cta>
+                Garantir meu acesso <span>→</span>
+              </Cta>
+              <p className="guarantee">
+                Você tem 7 dias para conhecer o produto. Se não fizer sentido para você, peça o
+                reembolso.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="duvidas">
+          <div className="wrap">
+            <div style={{ textAlign: "center" }}>
+              <span className="section-label">Dúvidas frequentes</span>
+              <h2 style={{ marginLeft: "auto", marginRight: "auto" }}>
+                Tudo para você começar com segurança.
+              </h2>
+            </div>
+            <div className="faq">
+              <details>
+                <summary>Preciso pagar todo mês?</summary>
+                <p>
+                  Não. Você faz um único pagamento de {PRICE_LABEL}. Não há assinatura nem renovação
+                  automática.
+                </p>
+              </details>
+              <details>
+                <summary>Como começo a usar?</summary>
+                <p>
+                  Após a confirmação do pagamento, você recebe o código de acesso. Crie sua conta,
+                  ative sua licença e comece pelas contas e gastos que já fazem parte da sua rotina.
+                </p>
+              </details>
+              <details>
+                <summary>Posso usar no celular?</summary>
+                <p>Sim. O Patrimo foi pensado para acompanhar sua rotina no celular, tablet ou computador.</p>
+              </details>
+              <details>
+                <summary>E se eu não gostar?</summary>
+                <p>
+                  Você tem 7 dias para conhecer o produto. Se não fizer sentido para você, solicite o
+                  reembolso pelo canal de suporte informado no checkout.
+                </p>
+              </details>
+            </div>
+          </div>
         </section>
       </main>
 
-      <footer className="border-t border-border px-6 py-8 text-center text-xs text-muted-foreground">
-        <p>
-          Patrimo ·{" "}
-          <Link to="/privacidade" className="hover:underline">
-            Privacidade
-          </Link>{" "}
-          ·{" "}
-          <Link to="/termos" className="hover:underline">
-            Termos de Uso
-          </Link>
-        </p>
-        <p className="mt-2">
-          As informações exibidas são calculadas com base nos dados que você informa e não
-          constituem recomendação de investimento.
-        </p>
+      <footer>
+        <div className="wrap footer-row">
+          <div className="brand">
+            <span className="mark">P</span>Patrimo
+          </div>
+          <div className="footer-links">
+            <Link to="/privacidade">Privacidade</Link>
+            <Link to="/termos">Termos de uso</Link>
+            <a href="mailto:suportepatrimo@gmail.com">Suporte</a>
+          </div>
+          <span>Organização financeira pessoal. Não é recomendação de investimento.</span>
+        </div>
       </footer>
     </div>
   );
