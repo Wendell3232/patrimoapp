@@ -36,7 +36,6 @@ html { scroll-behavior: smooth; }
 .pl .brand { display:inline-flex; align-items:center; gap:10px; font-weight:750; letter-spacing:-.03em; font-size:19px; }
 .pl .mark { display:grid; place-items:center; width:28px; height:28px; border-radius:8px; background:var(--green); color:#fff; font-size:15px; font-weight:800; }
 .pl nav { display:flex; gap:28px; align-items:center; color:var(--muted); font-size:14px; }
-.pl .login { color:var(--ink); font-weight:600; }
 .pl .button { display:inline-flex; align-items:center; justify-content:center; gap:9px; min-height:48px; padding:0 20px; border-radius:9px; background:var(--green); color:#fff; font-weight:700; font-size:15px; transition:.2s ease; }
 .pl .button:hover { background:var(--green-deep); transform:translateY(-1px); }
 .pl .button.light { background:#fff; color:var(--ink); border:1px solid var(--line); }
@@ -177,9 +176,6 @@ function Oferta() {
           <a href="#como-funciona">Como funciona</a>
           <a href="#duvidas">Dúvidas</a>
         </nav>
-        <Link className="login" to="/auth">
-          Entrar
-        </Link>
       </header>
 
       <main id="inicio">
