@@ -59,6 +59,7 @@ import { useTheme, type ThemePreference } from "@/components/app/ThemeProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useFinance, useRefreshFinance } from "@/lib/data";
 import type { Category, CategoryKind } from "@/lib/finance";
+import { toISODate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/configuracoes")({
   head: () => ({

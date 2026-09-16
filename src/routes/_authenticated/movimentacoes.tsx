@@ -84,10 +84,16 @@ export const Route = createFileRoute("/_authenticated/movimentacoes")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>) => ({
-    busca: typeof search.busca === "string" ? search.busca : undefined,
-    categoria: typeof search.categoria === "string" ? search.categoria : undefined,
-  }),
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { busca?: string | undefined; categoria?: string | undefined } => {
+    const busca = search["busca"];
+    const categoria = search["categoria"];
+    return {
+      busca: typeof busca === "string" ? busca : undefined,
+      categoria: typeof categoria === "string" ? categoria : undefined,
+    };
+  },
   component: Movimentacoes,
 });
 
