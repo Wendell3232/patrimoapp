@@ -287,8 +287,6 @@ Gerado no Patrimo Brasil`;
     );
   }
 
-  const topCategory = byCategory[0];
-
   return (
     <AppShell
       title="Relatórios"
@@ -434,18 +432,6 @@ Gerado no Patrimo Brasil`;
             <CardTitle className="text-base flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-primary" /> Comparação com o período anterior
             </CardTitle>
-            {/* Frase de Conclusão Analítica */}
-            <CardDescription className="text-sm font-medium text-foreground">
-              {expenseVariation <= 0 ? (
-                <span className="text-positive">
-                  👏 Seus gastos foram {Math.abs(expenseVariation).toFixed(0)}% menores do que no período anterior.
-                </span>
-              ) : (
-                <span className="text-amber-600 dark:text-amber-400">
-                  ⚠️ Seus gastos foram {expenseVariation.toFixed(0)}% maiores do que no período anterior.
-                </span>
-              )}
-            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-3 sm:grid-cols-3">
@@ -492,10 +478,6 @@ Gerado no Patrimo Brasil`;
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Entradas e saídas mês a mês</CardTitle>
-            {/* Frase explicativa antes do gráfico */}
-            <CardDescription className="text-xs text-foreground font-medium">
-              No total deste período, entraram {formatBRL(currentTotals.income)} e saíram {formatBRL(currentTotals.expense)}.
-            </CardDescription>
           </CardHeader>
           <CardContent className="h-64 pt-2">
             <ResponsiveContainer width="100%" height="100%">
@@ -522,14 +504,8 @@ Gerado no Patrimo Brasil`;
           {/* Gastos por Categoria com Clique Interativo */}
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">Gastos por categoria</CardTitle>
-              {/* Frase explicativa */}
-              <CardDescription className="text-xs text-foreground font-medium">
-                {topCategory
-                  ? `A categoria "${topCategory.name}" concentrou a maior fatia: ${formatBRL(topCategory.total)} (${topCategory.share.toFixed(0)}% do total).`
-                  : "Nenhuma saída registrada no período."}
-              </CardDescription>
-            </CardHeader>
+<CardTitle className="text-base">Gastos por categoria</CardTitle>
+          </CardHeader>
             <CardContent>
               {byCategory.length === 0 ? (
                 <p className="py-8 text-center text-xs text-muted-foreground">

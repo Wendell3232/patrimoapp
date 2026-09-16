@@ -12,9 +12,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as OfertaRouteImport } from './routes/oferta'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as TermosRouteImport } from './routes/termos'
 import { Route as AuthenticatedAgenteRouteImport } from './routes/_authenticated/agente'
+import { Route as AuthenticatedAtivarRouteImport } from './routes/_authenticated/ativar'
 import { Route as AuthenticatedCartoesRouteImport } from './routes/_authenticated/cartoes'
 import { Route as AuthenticatedCompromissosRouteImport } from './routes/_authenticated/compromissos'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
@@ -42,6 +44,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OfertaRoute = OfertaRouteImport.update({
+  id: '/oferta',
+  path: '/oferta',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
   path: '/privacidade',
@@ -55,6 +62,11 @@ const TermosRoute = TermosRouteImport.update({
 const AuthenticatedAgenteRoute = AuthenticatedAgenteRouteImport.update({
   id: '/agente',
   path: '/agente',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAtivarRoute = AuthenticatedAtivarRouteImport.update({
+  id: '/ativar',
+  path: '/ativar',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCartoesRoute = AuthenticatedCartoesRouteImport.update({
@@ -125,9 +137,11 @@ const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/oferta': typeof OfertaRoute
   '/privacidade': typeof PrivacidadeRoute
   '/termos': typeof TermosRoute
   '/agente': typeof AuthenticatedAgenteRoute
+  '/ativar': typeof AuthenticatedAtivarRoute
   '/cartoes': typeof AuthenticatedCartoesRoute
   '/compromissos': typeof AuthenticatedCompromissosRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
@@ -144,9 +158,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/oferta': typeof OfertaRoute
   '/privacidade': typeof PrivacidadeRoute
   '/termos': typeof TermosRoute
   '/agente': typeof AuthenticatedAgenteRoute
+  '/ativar': typeof AuthenticatedAtivarRoute
   '/cartoes': typeof AuthenticatedCartoesRoute
   '/compromissos': typeof AuthenticatedCompromissosRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
@@ -165,9 +181,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/oferta': typeof OfertaRoute
   '/privacidade': typeof PrivacidadeRoute
   '/termos': typeof TermosRoute
   '/_authenticated/agente': typeof AuthenticatedAgenteRoute
+  '/_authenticated/ativar': typeof AuthenticatedAtivarRoute
   '/_authenticated/cartoes': typeof AuthenticatedCartoesRoute
   '/_authenticated/compromissos': typeof AuthenticatedCompromissosRoute
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
@@ -186,10 +204,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
-    | '/auth'
+    | '/oferta'
     | '/privacidade'
     | '/termos'
     | '/agente'
+    | '/ativar'
     | '/cartoes'
     | '/compromissos'
     | '/configuracoes'
@@ -206,10 +225,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
-    | '/auth'
+    | '/oferta'
     | '/privacidade'
     | '/termos'
     | '/agente'
+    | '/ativar'
     | '/cartoes'
     | '/compromissos'
     | '/configuracoes'
@@ -227,10 +247,11 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
-    | '/auth'
+    | '/oferta'
     | '/privacidade'
     | '/termos'
     | '/_authenticated/agente'
+    | '/_authenticated/ativar'
     | '/_authenticated/cartoes'
     | '/_authenticated/compromissos'
     | '/_authenticated/configuracoes'
@@ -249,6 +270,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  OfertaRoute: typeof OfertaRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   TermosRoute: typeof TermosRoute
 }
@@ -276,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/oferta': {
+      id: '/oferta'
+      path: '/oferta'
+      fullPath: '/oferta'
+      preLoaderRoute: typeof OfertaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacidade': {
       id: '/privacidade'
       path: '/privacidade'
@@ -295,6 +324,13 @@ declare module '@tanstack/react-router' {
       path: '/agente'
       fullPath: '/agente'
       preLoaderRoute: typeof AuthenticatedAgenteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ativar': {
+      id: '/_authenticated/ativar'
+      path: '/ativar'
+      fullPath: '/ativar'
+      preLoaderRoute: typeof AuthenticatedAtivarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/cartoes': {
@@ -386,6 +422,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgenteRoute: typeof AuthenticatedAgenteRoute
+  AuthenticatedAtivarRoute: typeof AuthenticatedAtivarRoute
   AuthenticatedCartoesRoute: typeof AuthenticatedCartoesRoute
   AuthenticatedCompromissosRoute: typeof AuthenticatedCompromissosRoute
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
@@ -402,6 +439,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgenteRoute: AuthenticatedAgenteRoute,
+  AuthenticatedAtivarRoute: AuthenticatedAtivarRoute,
   AuthenticatedCartoesRoute: AuthenticatedCartoesRoute,
   AuthenticatedCompromissosRoute: AuthenticatedCompromissosRoute,
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
@@ -423,6 +461,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  OfertaRoute: OfertaRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   TermosRoute: TermosRoute,
 }

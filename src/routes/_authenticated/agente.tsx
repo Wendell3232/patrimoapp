@@ -156,7 +156,7 @@ function Agente() {
 
     // 3. Metas prioritárias
     if (data.goals.length > 0) {
-      const activeGoal = data.goals[0];
+      const activeGoal = data.goals[0]!;
       const pacing = goalPacing(activeGoal);
       insights.push({
         id: "goal-insight",
@@ -364,7 +364,7 @@ function Agente() {
                   )}
                 </Button>
                 <p className="text-center text-[10px] text-muted-foreground">
-                  Ctrl+Enter para enviar · O agente usa somente os seus dados cadastrados
+                  Ctrl+Enter para enviar · Usa somente os seus dados
                 </p>
               </div>
             </CardContent>
@@ -390,7 +390,7 @@ function Agente() {
               ) : (
                 <div className="flex h-48 flex-col items-center justify-center rounded-xl border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
                   <Bot className="h-8 w-8 text-muted-foreground/50 mb-2" />
-                  Selecione uma das perguntas sugeridas ou escreva sua dúvida ao lado para iniciar a conversa.
+                  Selecione uma pergunta sugerida ou escreva sua dúvida para começar.
                 </div>
               )}
             </CardContent>
