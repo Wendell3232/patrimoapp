@@ -1,13 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
-  Banknote,
+  Bell,
   Check,
   CreditCard,
+  FileDown,
+  LineChart,
+  Lock,
+  MessagesSquare,
+  Moon,
   PieChart,
+  PiggyBank,
   ShieldCheck,
   Sparkles,
   Target,
+  Wallet,
+  X,
 } from "lucide-react";
 
 import { ThemeToggle } from "@/components/app/ThemeToggle";
@@ -37,58 +45,130 @@ export const Route = createFileRoute("/oferta")({
   component: Oferta,
 });
 
+const NAV = [
+  { href: "#produto", label: "Produto" },
+  { href: "#como-funciona", label: "Como funciona" },
+  { href: "#recursos", label: "Recursos" },
+  { href: "#preco", label: "Preço" },
+  { href: "#duvidas", label: "Dúvidas" },
+];
+
+const TRUST = [
+  { icon: Check, label: `Pagamento único de ${PRICE_LABEL}` },
+  { icon: ShieldCheck, label: "LGPD · dados protegidos" },
+  { icon: Lock, label: "Sem conexão com bancos" },
+  { icon: Sparkles, label: "Acesso vitalício com atualizações" },
+];
+
+const WITHOUT = [
+  "Planilha para atualizar toda semana",
+  "Horas perdidas organizando números",
+  "Dinheiro some sem você saber para onde foi",
+  "Susto no fechamento do mês",
+];
+
+const WITH = [
+  "Registrado em segundos, sem planilha",
+  "Saldo acompanha a virada do mês automaticamente",
+  "Relatórios mostram para onde o dinheiro foi",
+  "Fechamento tranquilo, todo mês",
+];
+
+const STEPS = [
+  {
+    number: "01",
+    title: "Compre",
+    text: `Faça o pagamento único de ${PRICE_LABEL} com PIX, cartão ou boleto.`,
+  },
+  {
+    number: "02",
+    title: "Receba o código",
+    text: "Assim que o pagamento confirmar, você recebe um código de licença.",
+  },
+  {
+    number: "03",
+    title: "Crie sua conta e ative",
+    text: "Crie sua conta gratuita, cole o código na tela de ativação e pronto: acesso vitalício.",
+  },
+];
+
 const FEATURES = [
   {
-    icon: Banknote,
-    title: "Patrimônio contínuo",
-    text: "Seu dinheiro acompanha a virada do mês sem retrabalho: o saldo de um mês vira o saldo do seguinte automaticamente.",
+    icon: Wallet,
+    title: "Contas e patrimônio",
+    text: "Acompanhe seus saldos e veja seu patrimônio evoluir mês a mês, com o saldo seguindo para o mês seguinte.",
   },
   {
     icon: CreditCard,
-    title: "Faturas que se pagam",
-    text: "Compras parceladas entram no cartão uma a uma, mês após mês, e aparecem como compromissos futuros.",
+    title: "Cartões e faturas",
+    text: "Compras parceladas entram no cartão uma a uma e aparecem como compromissos futuros.",
   },
   {
-    icon: PieChart,
+    icon: PiggyBank,
+    title: "Metas financeiras",
+    text: "Reserva de emergência, viagem, entrada do carro: acompanhe o progresso em reais e a previsão de conclusão.",
+  },
+  {
+    icon: LineChart,
     title: "Relatórios claros",
     text: "Entradas, saídas e sobras do período em gráficos simples. Você entende para onde seu dinheiro vai.",
   },
   {
     icon: Target,
-    title: "Metas de verdade",
-    text: "Reserva de emergência, viagem, entrada do carro: acompanhe o progresso em reais e a previsão de conclusão.",
+    title: "Orçamentos",
+    text: "Defina limites por categoria e veja, mês a mês, se está dentro do planejado.",
   },
   {
-    icon: Sparkles,
+    icon: Bell,
+    title: "Notificações",
+    text: "Receba lembretes e avisos relacionados às suas finanças sem bagunçar sua tela.",
+  },
+  {
+    icon: MessagesSquare,
     title: "Assistente financeiro",
     text: "Pergunte e receba resumos e orientações sobre os seus números, baseados nos seus próprios dados.",
   },
   {
-    icon: ShieldCheck,
-    title: "Seus dados só seus",
-    text: "Sem conexão com bancos. Cada pessoa vê apenas os próprios dados, com login protegido.",
+    icon: FileDown,
+    title: "Exportação dos seus dados",
+    text: "Leve seus dados com você: exportação em JSON direto do app, quando quiser.",
+  },
+  {
+    icon: Moon,
+    title: "Tema claro e escuro",
+    text: "Use no celular, tablet ou computador, com o visual que você prefere.",
   },
 ];
 
-const STEPS = [
+const PRIVACY = [
   {
-    title: "1. Compre",
-    text: `Faça o pagamento único de ${PRICE_LABEL} com PIX, cartão ou boleto.`,
+    title: "Sem Open Finance",
+    text: "Não conectamos no seu banco e nunca pedimos a senha do seu banco. Você lança manualmente.",
   },
   {
-    title: "2. Receba o código",
-    text: "Assim que o pagamento confirmar, você recebe um código de licença.",
+    title: "LGPD",
+    text: "Tratamos seus dados conforme a Lei nº 13.709/2018, com direitos garantidos.",
   },
   {
-    title: "3. Crie sua conta e ative",
-    text: "Crie sua conta gratuita, cole o código e pronto: acesso vitalício.",
+    title: "Isolado por usuário",
+    text: "Cada pessoa acessa apenas os próprios dados. Nada de dados de terceiros.",
   },
+  {
+    title: "Zero anúncios",
+    text: "Não vendemos dados e não usamos seus números para rastreamento de publicidade.",
+  },
+];
+
+const AI_PROMPS = [
+  "Quanto gastei em restaurantes este mês?",
+  "Onde posso cortar gastos?",
+  "Quando vou atingir minha meta?",
 ];
 
 const FAQ = [
   {
-    q: "É mensal?",
-    a: "Não. Você paga R$ 37,90 uma única vez e tem acesso vitalício, incluindo todas as atualizações futuras.",
+    q: "Preciso pagar todos os meses?",
+    a: "Não. Você paga R$ 37,90 uma única vez e tem acesso vitalício, incluindo todas as atualizações futuras. Não há assinatura, renovação ou cobrança recorrente.",
   },
   {
     q: "Como recebo o acesso?",
@@ -99,8 +179,12 @@ const FAQ = [
     a: "PIX (aprovação imediata), cartão de crédito e boleto, direto na página de checkout.",
   },
   {
+    q: "E se eu não gostar?",
+    a: "Você tem 7 dias de garantia. Se o produto não servir, devolvemos seu dinheiro.",
+  },
+  {
     q: "Meus dados ficam seguros?",
-    a: "Sim. Não conectamos com o seu banco e cada pessoa acessa apenas os próprios dados, protegidos por login e senha.",
+    a: "Sim. Não conectamos com o seu banco, cada pessoa acessa apenas os próprios dados e o tratamento segue a LGPD. Veja a Política de Privacidade no rodapé.",
   },
 ];
 
@@ -116,7 +200,7 @@ function BuyButton({ big = true }: { big?: boolean }) {
     <Button asChild size={big ? "lg" : "default"}>
       <a href={CHECKOUT_URL} target="_blank" rel="noreferrer">
         Garantir acesso por {PRICE_LABEL}
-        <ArrowRight className="ml-2 h-4 w-4" />
+        {big && <ArrowRight className="ml-2 h-4 w-4" />}
       </a>
     </Button>
   );
@@ -127,66 +211,130 @@ function Oferta() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-6">
-          <span className="flex items-center gap-3 font-display text-xl font-semibold">
+          <Link to="/" className="flex items-center gap-3 font-display text-xl font-semibold">
             <span className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
               P
             </span>
             Patrimo
-          </span>
+          </Link>
+          <nav className="hidden items-center gap-6 text-sm text-muted-foreground lg:flex">
+            {NAV.map((item) => (
+              <a key={item.href} href={item.href} className="transition-colors hover:text-foreground">
+                {item.label}
+              </a>
+            ))}
+          </nav>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <Button asChild size="sm">
+            <Button asChild variant="outline" size="sm">
               <Link to="/auth">Entrar</Link>
             </Button>
+            <span className="hidden sm:inline-flex">
+              <BuyButton big={false} />
+            </span>
           </div>
         </div>
       </header>
 
       <main>
-        <section className="mx-auto max-w-3xl px-6 pb-16 pt-16 text-center sm:pt-24">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
-            <Sparkles className="h-3.5 w-3.5" />
-            Gerenciador financeiro pessoal
-          </span>
-          <h1 className="mt-6 font-display text-4xl font-semibold leading-tight sm:text-5xl">
-            Seu patrimônio, mês a mês, sem planilha.
-          </h1>
-          <p className="mx-auto mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
-            Contas, cartões parcelados, metas e relatórios em reais — com o saldo sempre
-            acompanhando a virada do mês.
-          </p>
-
-          <div className="mt-10 rounded-2xl border border-border bg-card p-8">
-            <p className="text-sm text-muted-foreground">Pagamento único</p>
-            <p className="mt-1 font-display text-5xl font-bold tracking-tight">
-              {PRICE_LABEL}
+        <section className="text-center" id="produto">
+          <div className="mx-auto max-w-3xl px-6 pb-14 pt-16 sm:pt-24">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
+              <Sparkles className="h-3.5 w-3.5" />
+              Gerenciador financeiro pessoal
+            </span>
+            <h1 className="mt-6 font-display text-4xl font-semibold leading-tight sm:text-5xl">
+              Saiba para onde vai cada real.
+            </h1>
+            <p className="mx-auto mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
+              Contas, cartões, metas e orçamentos em reais — sem planilha e sem dar a senha do seu
+              banco. Acesso vitalício por um único pagamento.
             </p>
-            <p className="mt-1 text-sm text-muted-foreground">acesso vitalício, sem mensalidade</p>
-            <div className="mt-6 flex justify-center">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <BuyButton />
+              <Button asChild size="lg" variant="outline">
+                <a href="#como-funciona">
+                  Ver como funciona
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </a>
+              </Button>
             </div>
-            <ul className="mx-auto mt-6 grid max-w-sm gap-2 text-left text-sm text-muted-foreground">
-              {["Pagamento único de R$ 37,90", "Acesso vitalício com atualizações", "Cancelamento não é necessário — você nunca renova"].map(
-                (item) => (
-                  <li key={item} className="flex items-start gap-2">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-positive" />
-                    {item}
-                  </li>
-                ),
-              )}
+            <ul className="mx-auto mt-8 flex max-w-2xl flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+              {TRUST.map((item) => (
+                <li key={item.label} className="flex items-center gap-1.5">
+                  <item.icon className="h-4 w-4 text-positive" />
+                  {item.label}
+                </li>
+              ))}
             </ul>
           </div>
         </section>
 
         <section className="border-t border-border bg-card/40 px-6 py-14">
-          <div className="mx-auto max-w-4xl">
-            <h2 className="text-center font-display text-2xl font-semibold">Como funciona</h2>
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              {STEPS.map((step) => (
-                <Card key={step.title}>
-                  <CardContent className="space-y-2 p-5">
-                    <p className="text-sm font-semibold text-primary">{step.title}</p>
-                    <p className="text-sm text-muted-foreground">{step.text}</p>
+          <div className="mx-auto max-w-5xl">
+            <h2 className="text-center font-display text-2xl font-semibold sm:text-3xl">
+              Imagine fechar o mês sem estresse.
+            </h2>
+            <div className="mt-10 grid gap-4 sm:grid-cols-2">
+              <Card>
+                <CardContent className="p-6">
+                  <p className="font-semibold text-muted-foreground">Sem o Patrimo</p>
+                  <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
+                    {WITHOUT.map((item) => (
+                      <li key={item} className="flex items-start gap-2">
+                        <X className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground/60" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+              <Card className="border-positive/40">
+                <CardContent className="p-6">
+                  <p className="font-semibold text-positive">Com o Patrimo</p>
+                  <ul className="mt-5 space-y-3 text-sm text-muted-foreground">
+                    {WITH.map((item) => (
+                      <li key={item} className="flex items-start gap-2">
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-positive" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-4xl px-6 py-14" id="como-funciona">
+          <h2 className="text-center font-display text-2xl font-semibold sm:text-3xl">
+            Como funciona em 3 passos
+          </h2>
+          <div className="mt-10 grid gap-4 sm:grid-cols-3">
+            {STEPS.map((step) => (
+              <Card key={step.number}>
+                <CardContent className="space-y-3 p-6">
+                  <p className="font-display text-3xl font-bold text-primary">{step.number}</p>
+                  <p className="font-semibold">{step.title}</p>
+                  <p className="text-sm text-muted-foreground">{step.text}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        <section className="border-t border-border bg-card/40 px-6 py-14" id="recursos">
+          <div className="mx-auto max-w-6xl">
+            <h2 className="text-center font-display text-2xl font-semibold sm:text-3xl">
+              Tudo incluído. Sem esconder nada.
+            </h2>
+            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {FEATURES.map((feature) => (
+                <Card key={feature.title}>
+                  <CardContent className="space-y-3 p-6">
+                    <feature.icon className="h-6 w-6 text-primary" />
+                    <p className="font-semibold">{feature.title}</p>
+                    <p className="text-sm text-muted-foreground">{feature.text}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -194,25 +342,79 @@ function Oferta() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-5xl px-6 py-14">
-          <h2 className="text-center font-display text-2xl font-semibold">
-            O que você ganha
+        <section className="mx-auto max-w-5xl px-6 py-14" id="privacidade">
+          <h2 className="text-center font-display text-2xl font-semibold sm:text-3xl">
+            Privacidade que é princípio, não recurso.
           </h2>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map((feature) => (
-              <Card key={feature.title}>
+          <p className="mx-auto mt-3 max-w-2xl text-center text-sm text-muted-foreground">
+            Você lança seus dados manualmente — seus números ficam só seus: isolados, sem anúncio e
+            tratados conforme a LGPD.
+          </p>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {PRIVACY.map((item) => (
+              <Card key={item.title}>
                 <CardContent className="space-y-3 p-5">
-                  <feature.icon className="h-6 w-6 text-primary" />
-                  <p className="font-semibold">{feature.title}</p>
-                  <p className="text-sm text-muted-foreground">{feature.text}</p>
+                  <ShieldCheck className="h-6 w-6 text-primary" />
+                  <p className="font-semibold">{item.title}</p>
+                  <p className="text-sm text-muted-foreground">{item.text}</p>
                 </CardContent>
               </Card>
             ))}
           </div>
+          <div className="mt-8 text-center">
+            <Button asChild variant="outline">
+              <Link to="/privacidade">Ver nossa Política de Privacidade</Link>
+            </Button>
+          </div>
         </section>
 
-        <section className="mx-auto max-w-3xl px-6 py-14">
-          <h2 className="text-center font-display text-2xl font-semibold">Dúvidas frequentes</h2>
+        <section className="border-t border-border bg-card/40 px-6 py-14">
+          <div className="mx-auto grid max-w-5xl items-center gap-10 sm:grid-cols-2">
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
+                <MessagesSquare className="h-3.5 w-3.5" />
+                Assistente financeiro
+              </span>
+              <h2 className="mt-4 font-display text-2xl font-semibold sm:text-3xl">
+                Pergunte qualquer coisa sobre o seu dinheiro.
+              </h2>
+              <p className="mt-3 text-sm text-muted-foreground">
+                O assistente responde com base nos seus próprios dados, explicando em português
+                claro — e nada sai da sua conta.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {AI_PROMPS.map((prompt) => (
+                  <span
+                    key={prompt}
+                    className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground"
+                  >
+                    "{prompt}"
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-3 text-sm text-muted-foreground">
+              <div className="rounded-xl border border-border bg-card p-5">
+                <p className="font-semibold text-foreground">Resumo instantâneo</p>
+                <p className="mt-1.5">
+                  Entenda entradas, saídas e sobras do período em segundos, sem abrir relatório.
+                </p>
+              </div>
+              <div className="rounded-xl border border-border bg-card p-5">
+                <p className="font-semibold text-foreground">Ensina, não só responde</p>
+                <p className="mt-1.5">
+                  Reserva de emergência, bola de neve, orçamento: o assistente explica no contexto
+                  dos seus números.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-3xl px-6 py-14" id="duvidas">
+          <h2 className="text-center font-display text-2xl font-semibold sm:text-3xl">
+            Ainda na dúvida? A gente responde.
+          </h2>
           <div className="mt-8 space-y-3">
             {FAQ.map((item) => (
               <Card key={item.q}>
@@ -225,12 +427,46 @@ function Oferta() {
           </div>
         </section>
 
-        <section className="border-t border-border bg-card/40 px-6 py-14 text-center">
-          <h2 className="font-display text-2xl font-semibold">
-            Mais um motivo para começar hoje.
+        <section className="border-t border-border bg-card/40 px-6 py-14" id="preco">
+          <div className="mx-auto max-w-md">
+            <Card>
+              <CardContent className="space-y-4 p-8 text-center">
+                <p className="text-sm text-muted-foreground">Pagamento único</p>
+                <p className="font-display text-6xl font-bold tracking-tight">{PRICE_LABEL}</p>
+                <p className="text-sm text-muted-foreground">
+                  acesso vitalício, sem mensalidade e com atualizações inclusas
+                </p>
+                <ul className="mx-auto grid max-w-xs gap-2 text-left text-sm text-muted-foreground">
+                  {[
+                    "Todos os recursos liberados",
+                    "Sem assinatura e sem renovação",
+                    "Garantia de 7 dias",
+                    "R$ 37,90 é menos do que um lanche",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-positive" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex justify-center pt-2">
+                  <BuyButton />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  PIX com aprovação imediata, cartão ou boleto.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <section className="px-6 py-16 text-center">
+          <h2 className="font-display text-2xl font-semibold sm:text-3xl">
+            Quanto você perdeu esse mês sem saber?
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-            {PRICE_LABEL} é menos do que um lanche. Seu controle financeiro dura a vida toda.
+            Não precisa de mais disciplina. Precisa de clareza. Pague uma vez e tenha controle
+            financeiro por toda a vida.
           </p>
           <div className="mt-6 flex justify-center">
             <BuyButton />

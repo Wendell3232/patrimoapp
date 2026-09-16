@@ -40,6 +40,7 @@ function Privacidade() {
         <h3>Você informa</h3>
         <ul>
           <li>Cadastro: nome completo e e-mail.</li>
+          <li>Código de licença: para validar seu acesso vitalício após a compra.</li>
           <li>
             Senha: armazenada apenas como hash pelo nosso provedor de autenticação; nunca temos
             acesso ao texto original.
@@ -70,7 +71,7 @@ function Privacidade() {
       <section className="space-y-3">
         <h2>3. Para que usamos</h2>
         <ul>
-          <li><strong>Execução do contrato:</strong> manter sua conta e calcular seus números.</li>
+          <li><strong>Execução do contrato:</strong> manter sua conta, validar sua licença e calcular seus números.</li>
           <li><strong>Consentimento:</strong> uso do assistente financeiro.</li>
           <li><strong>Interesse legítimo:</strong> segurança, prevenção de abuso e correção de erros.</li>
           <li><strong>Obrigação legal:</strong> atendimento a determinações legais e a pedidos de titulares.</li>
@@ -87,6 +88,7 @@ function Privacidade() {
         <ul>
           <li>Provedor de hospedagem, banco de dados e autenticação da aplicação.</li>
           <li>Provedor do modelo de linguagem que responde no assistente financeiro, apenas quando você envia uma pergunta.</li>
+          <li>Provedor de checkout (Wiven): apenas o necessário para concluir a compra e o reembolso. Não armazenamos dados de cartão de crédito real de pagamento.</li>
           <li>Autoridades competentes, quando houver obrigação legal ou ordem judicial.</li>
         </ul>
       </section>
