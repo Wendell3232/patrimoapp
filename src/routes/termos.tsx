@@ -173,7 +173,7 @@ function Termos() {
         <p>
           Estes Termos são regidos pelas leis brasileiras, incluindo a Lei Geral de Proteção de
           Dados (Lei nº 13.709/2018) e o Código de Defesa do Consumidor (Lei nº 8.078/1990).
-          Dúvidas e solicitações: <strong>atv.didaticas@gmail.com</strong>.
+          Dúvidas e solicitações: <strong>suportepatrimo@gmail.com</strong>.
         </p>
       </section>
     </LegalLayout>
