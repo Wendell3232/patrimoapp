@@ -49,7 +49,9 @@ function Termos() {
         </p>
         <ul>
           <li>Não há conexão com bancos, Open Finance ou importação automática de extratos.</li>
-          <li>Não somos instituição financeira e não realizamos pagamentos ou transferências reais.</li>
+          <li>
+            Não somos instituição financeira e não realizamos pagamentos ou transferências reais.
+          </li>
           <li>
             O conteúdo do app, incluindo o assistente financeiro, é informativo e não constitui
             recomendação de investimento.
@@ -62,7 +64,10 @@ function Termos() {
         <ul>
           <li>É necessário ter 18 anos ou mais e fornecer nome e e-mail válidos.</li>
           <li>Você é responsável por manter a senha em sigilo e pelo que ocorre na sua conta.</li>
-          <li>Cada pessoa acessa apenas os próprios dados; não é permitido tentar acessar dados de terceiros.</li>
+          <li>
+            Cada pessoa acessa apenas os próprios dados; não é permitido tentar acessar dados de
+            terceiros.
+          </li>
           <li>O acesso é pessoal e intransferível, vinculado ao titular da conta.</li>
         </ul>
       </section>
@@ -71,14 +76,23 @@ function Termos() {
         <h2>4. Licença de uso vitalícia</h2>
         <p>
           O Patrimo é comercializado por uma{" "}
-          <strong>licença individual de pagamento único de {PRICE_LABEL}</strong>, sem mensalidade ou
-          renovação.
+          <strong>licença individual de pagamento único de {PRICE_LABEL}</strong>, sem mensalidade
+          ou renovação.
         </p>
         <ul>
-          <li>A licença dá acesso a todos os recursos do serviço enquanto ele existir, incluindo atualizações futuras.</li>
+          <li>
+            A licença dá acesso a todos os recursos do serviço enquanto ele existir, incluindo
+            atualizações futuras.
+          </li>
           <li>A licença é pessoal, não transferível e não compartilhável entre várias pessoas.</li>
-          <li>Ao excluir sua conta, o acesso ao serviço com aquela licença é encerrado; a licença fica vinculada ao e-mail da compra e não pode ser transferida para outra conta.</li>
-          <li>Podemos suspender o acesso por violação destes Termos, sem direito a reembolso nesse caso.</li>
+          <li>
+            Ao excluir sua conta, o acesso ao serviço com aquela licença é encerrado; a licença fica
+            vinculada ao e-mail da compra e não pode ser transferida para outra conta.
+          </li>
+          <li>
+            Podemos suspender o acesso por violação destes Termos, sem direito a reembolso nesse
+            caso.
+          </li>
         </ul>
       </section>
 
@@ -93,10 +107,21 @@ function Termos() {
       <section className="space-y-3">
         <h2>6. Pagamentos</h2>
         <ul>
-          <li>O pagamento é processado pelo provedor de checkout Wiven, com PIX (aprovação imediata), cartão de crédito ou boleto.</li>
-          <li>Não coletamos, armazenamos ou processamos dados de cartão de crédito real de pagamento.</li>
-          <li>Os cartões cadastrados no app são apenas rótulos para organizar suas faturas e não geram cobranças.</li>
-          <li>Dúvidas sobre comprovante, nota fiscal ou cobrança devem ser tratadas com o provedor de checkout utilizado.</li>
+          <li>
+            O pagamento é processado pelo provedor de checkout Wiven, com PIX (aprovação imediata),
+            cartão de crédito ou boleto.
+          </li>
+          <li>
+            Não coletamos, armazenamos ou processamos dados de cartão de crédito real de pagamento.
+          </li>
+          <li>
+            Os cartões cadastrados no app são apenas rótulos para organizar suas faturas e não geram
+            cobranças.
+          </li>
+          <li>
+            Dúvidas sobre comprovante, nota fiscal ou cobrança devem ser tratadas com o provedor de
+            checkout utilizado.
+          </li>
         </ul>
       </section>
 
@@ -107,16 +132,21 @@ function Termos() {
           período, se o produto não atender, você pode solicitar o reembolso, que será processado
           pelo provedor de checkout conforme a política aplicável (incluindo o direito de
           arrependimento previsto no art. 49 do Código de Defesa do Consumidor para compras fora do
-          estabelecimento comercial). Após o reembolso, o código de licença é revogado.
+          estabelecimento comercial). Após o reembolso, a licença é revogada.
         </p>
       </section>
 
       <section className="space-y-3">
         <h2>8. Conduta do usuário</h2>
         <ul>
-          <li>É proibido usar o serviço para atividades ilícitas ou que violem direitos de terceiros.</li>
-          <li>Não é permitido sobrecarregar a infraestrutura, tentar acessar sistemas alheios ou aplicar engenharia reversa.</li>
-          <li>Comprar, revender ou distribuir códigos de licença sem autorização é proibido.</li>
+          <li>
+            É proibido usar o serviço para atividades ilícitas ou que violem direitos de terceiros.
+          </li>
+          <li>
+            Não é permitido sobrecarregar a infraestrutura, tentar acessar sistemas alheios ou
+            aplicar engenharia reversa.
+          </li>
+          <li>Comprar, revender ou distribuir licenças sem autorização é proibido.</li>
         </ul>
       </section>
 
@@ -161,9 +191,17 @@ function Termos() {
       <section className="space-y-3">
         <h2>11. Alterações e encerramento</h2>
         <ul>
-          <li>Podemos alterar ou descontinuar funcionalidades, avisando com antecedência quando a mudança for relevante.</li>
-          <li>Você pode encerrar sua conta quando quiser pela tela de Perfil, e seus dados serão excluídos.</li>
-          <li>Podemos encerrar contas que violem estes Termos ou sejam usadas para fins ilícitos.</li>
+          <li>
+            Podemos alterar ou descontinuar funcionalidades, avisando com antecedência quando a
+            mudança for relevante.
+          </li>
+          <li>
+            Você pode encerrar sua conta quando quiser pela tela de Perfil, e seus dados serão
+            excluídos.
+          </li>
+          <li>
+            Podemos encerrar contas que violem estes Termos ou sejam usadas para fins ilícitos.
+          </li>
         </ul>
       </section>
 
@@ -171,8 +209,8 @@ function Termos() {
         <h2>12. Lei aplicável e contato</h2>
         <p>
           Estes Termos são regidos pelas leis brasileiras, incluindo a Lei Geral de Proteção de
-          Dados (Lei nº 13.709/2018) e o Código de Defesa do Consumidor (Lei nº 8.078/1990).
-          Dúvidas e solicitações: <strong>suportepatrimo@gmail.com</strong>.
+          Dados (Lei nº 13.709/2018) e o Código de Defesa do Consumidor (Lei nº 8.078/1990). Dúvidas
+          e solicitações: <strong>suportepatrimo@gmail.com</strong>.
         </p>
       </section>
     </LegalLayout>

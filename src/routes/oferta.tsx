@@ -298,7 +298,9 @@ function Oferta() {
                 <span className="feature-icon">01</span>
                 <div>
                   <strong>Contas, saldos e patrimônio</strong>
-                  <span>Registre onde seu dinheiro está e acompanhe sua evolução ao longo do tempo.</span>
+                  <span>
+                    Registre onde seu dinheiro está e acompanhe sua evolução ao longo do tempo.
+                  </span>
                 </div>
               </div>
               <div className="feature">
@@ -312,7 +314,9 @@ function Oferta() {
                 <span className="feature-icon">03</span>
                 <div>
                   <strong>Metas e orçamentos</strong>
-                  <span>Defina um destino para o dinheiro e acompanhe o avanço em valores reais.</span>
+                  <span>
+                    Defina um destino para o dinheiro e acompanhe o avanço em valores reais.
+                  </span>
                 </div>
               </div>
               <div className="feature">
@@ -338,13 +342,16 @@ function Oferta() {
               </article>
               <article className="step">
                 <span className="step-n">02</span>
-                <h3>Receba seu código</h3>
-                <p>Depois da confirmação, seu código de licença chega para a ativação.</p>
+                <h3>Receba a confirmação</h3>
+                <p>Após o pagamento, seu acesso é liberado automaticamente no e-mail da compra.</p>
               </article>
               <article className="step">
                 <span className="step-n">03</span>
                 <h3>Crie sua conta</h3>
-                <p>Ative o acesso, cadastre suas primeiras contas e comece pelo que já importa para você.</p>
+                <p>
+                  Entre com o mesmo e-mail da compra, seu acesso já estará liberado. Cadastre suas
+                  contas e comece pelo que já importa para você.
+                </p>
               </article>
             </div>
           </div>
@@ -416,19 +423,23 @@ function Oferta() {
               <details>
                 <summary>Como começo a usar?</summary>
                 <p>
-                  Após a confirmação do pagamento, você recebe o código de acesso. Crie sua conta,
-                  ative sua licença e comece pelas contas e gastos que já fazem parte da sua rotina.
+                  Após a confirmação do pagamento, crie sua conta com o mesmo e-mail da compra e o
+                  acesso já estará liberado. Comece pelas contas e gastos que já fazem parte da sua
+                  rotina.
                 </p>
               </details>
               <details>
                 <summary>Posso usar no celular?</summary>
-                <p>Sim. O Patrimo foi pensado para acompanhar sua rotina no celular, tablet ou computador.</p>
+                <p>
+                  Sim. O Patrimo foi pensado para acompanhar sua rotina no celular, tablet ou
+                  computador.
+                </p>
               </details>
               <details>
                 <summary>E se eu não gostar?</summary>
                 <p>
-                  Você tem 7 dias para conhecer o produto. Se não fizer sentido para você, solicite o
-                  reembolso pelo canal de suporte informado no checkout.
+                  Você tem 7 dias para conhecer o produto. Se não fizer sentido para você, solicite
+                  o reembolso pelo canal de suporte informado no checkout.
                 </p>
               </details>
             </div>
