@@ -5,7 +5,7 @@ const SERVICE_ROLE_KEY =
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const WIVEN_SECRET = Deno.env.get("WIVEN_WEBHOOK_SECRET");
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const FROM_EMAIL = Deno.env.get("FROM_EMAIL") ?? "Patrimo <noreply@patrimo.com.br>";
+const FROM_EMAIL = Deno.env.get("FROM_EMAIL") ?? "Patrimo <onboarding@resend.dev>";
 
 const SIGNATURE_HEADERS = [
   "x-wiven-signature",
