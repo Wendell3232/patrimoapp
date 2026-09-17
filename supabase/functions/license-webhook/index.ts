@@ -16,7 +16,28 @@ if (!SERVICE_ROLE_KEY || !SUPABASE_URL) {
   throw new Error("Faltam SERVICE_ROLE_KEY ou SUPABASE_URL");
 }
 
+function isNewSupabaseApiKey(value: string): boolean {
+  return value.startsWith("sb_publishable_") || value.startsWith("sb_secret_");
+}
+
+function createSupabaseFetch(key: string): typeof fetch {
+  return (input, init) => {
+    const headers = new Headers(
+      typeof Request !== "undefined" && input instanceof Request ? input.headers : undefined,
+    );
+    if (init?.headers) {
+      new Headers(init.headers).forEach((value, header) => headers.set(header, value));
+    }
+    if (isNewSupabaseApiKey(key) && headers.get("Authorization") === `Bearer ${key}`) {
+      headers.delete("Authorization");
+    }
+    headers.set("apikey", key);
+    return fetch(input, { ...init, headers });
+  };
+}
+
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+  global: { fetch: createSupabaseFetch(SERVICE_ROLE_KEY) },
   auth: { persistSession: false, autoRefreshToken: false },
 });
 
