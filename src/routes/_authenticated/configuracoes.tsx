@@ -67,12 +67,14 @@ export const Route = createFileRoute("/_authenticated/configuracoes")({
       { title: "Configurações — Patrimo" },
       {
         name: "description",
-        content: "Gerencie categorias, alertas inteligentes, preferências visuais e dados com segurança.",
+        content:
+          "Gerencie categorias, alertas inteligentes, preferências visuais e dados com segurança.",
       },
       { property: "og:title", content: "Configurações — Patrimo" },
       {
         property: "og:description",
-        content: "Gerencie categorias, alertas inteligentes, preferências visuais e dados com segurança.",
+        content:
+          "Gerencie categorias, alertas inteligentes, preferências visuais e dados com segurança.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -128,7 +130,12 @@ function Configuracoes() {
   }[] = [
     { value: "light", label: "Claro", description: "Fundo claro e contraste suave", icon: Sun },
     { value: "dark", label: "Escuro", description: "Confortável para a visão à noite", icon: Moon },
-    { value: "system", label: "Automático", description: "Segue a preferência do dispositivo", icon: Laptop },
+    {
+      value: "system",
+      label: "Automático",
+      description: "Segue a preferência do dispositivo",
+      icon: Laptop,
+    },
   ];
 
   function saveAlertSettings() {
@@ -245,7 +252,8 @@ function Configuracoes() {
       commitments: data.commitments,
       transactions: data.transactions,
     };
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObject, null, 2));
+    const dataStr =
+      "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObject, null, 2));
     const dlAnchor = document.createElement("a");
     dlAnchor.setAttribute("href", dataStr);
     dlAnchor.setAttribute("download", `patrimo-backup-${toISODate(new Date())}.json`);
@@ -266,11 +274,19 @@ function Configuracoes() {
   return (
     <AppShell title="Configurações">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 sm:w-auto sm:inline-flex">
-          <TabsTrigger value="categorias">Categorias</TabsTrigger>
-          <TabsTrigger value="alertas">Alertas</TabsTrigger>
-          <TabsTrigger value="preferencias">Preferências</TabsTrigger>
-          <TabsTrigger value="dados">Dados e Privacidade</TabsTrigger>
+        <TabsList className="w-full justify-start overflow-x-auto sm:inline-flex sm:w-auto sm:justify-center">
+          <TabsTrigger value="categorias" className="shrink-0">
+            Categorias
+          </TabsTrigger>
+          <TabsTrigger value="alertas" className="shrink-0">
+            Alertas
+          </TabsTrigger>
+          <TabsTrigger value="preferencias" className="shrink-0">
+            Preferências
+          </TabsTrigger>
+          <TabsTrigger value="dados" className="shrink-0">
+            Dados e Privacidade
+          </TabsTrigger>
         </TabsList>
 
         {/* ABA 1: CATEGORIAS */}
@@ -280,7 +296,8 @@ function Configuracoes() {
               <div>
                 <CardTitle className="text-base">Categorias cadastradas</CardTitle>
                 <CardDescription className="text-xs">
-                  Crie, edite ou mescle suas categorias. Categorias em uso não são apagadas sem destino seguro.
+                  Crie, edite ou mescle suas categorias. Categorias em uso não são apagadas sem
+                  destino seguro.
                 </CardDescription>
               </div>
               <Dialog open={openCreateCat} onOpenChange={setOpenCreateCat}>
@@ -293,7 +310,8 @@ function Configuracoes() {
                   <DialogHeader>
                     <DialogTitle>Criar nova categoria</DialogTitle>
                     <DialogDescription>
-                      Categorias ajudam você e o Agente Financeiro a entender para onde vai o seu dinheiro.
+                      Categorias ajudam você e o Agente Financeiro a entender para onde vai o seu
+                      dinheiro.
                     </DialogDescription>
                   </DialogHeader>
 
@@ -349,10 +367,7 @@ function Configuracoes() {
                   const txCount = data.transactions.filter((t) => t.category_id === cat.id).length;
 
                   return (
-                    <div
-                      key={cat.id}
-                      className="flex items-center justify-between py-3 text-sm"
-                    >
+                    <div key={cat.id} className="flex items-center justify-between py-3 text-sm">
                       <div className="flex items-center gap-2.5">
                         <span
                           className="h-3 w-3 rounded-full shrink-0"
@@ -499,9 +514,7 @@ function Configuracoes() {
                       <span className="block text-sm font-semibold text-foreground">
                         {opt.label}
                       </span>
-                      <span className="block text-xs text-muted-foreground">
-                        {opt.description}
-                      </span>
+                      <span className="block text-xs text-muted-foreground">{opt.description}</span>
                     </div>
                   </Button>
                 ))}
@@ -557,7 +570,8 @@ function Configuracoes() {
                 <ShieldCheck className="h-5 w-5 text-positive" /> Seus dados são privados e seguros
               </CardTitle>
               <CardDescription className="text-xs">
-                O Patrimo não vende, não compartilha e não utiliza seus dados para publicidade. Suas finanças pertencem exclusivamente a você.
+                O Patrimo não vende, não compartilha e não utiliza seus dados para publicidade. Suas
+                finanças pertencem exclusivamente a você.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -565,7 +579,12 @@ function Configuracoes() {
                 <Button variant="outline" size="sm" onClick={exportJSON}>
                   <Download className="mr-1.5 h-4 w-4" /> Exportar backup completo (JSON)
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => void loadDemo()} disabled={demoLoading}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => void loadDemo()}
+                  disabled={demoLoading}
+                >
                   <Database className="mr-1.5 h-4 w-4" />
                   {demoLoading ? "Carregando..." : "Carregar dados de demonstração"}
                 </Button>
@@ -585,7 +604,9 @@ function Configuracoes() {
             </CardHeader>
             <CardContent className="space-y-3 text-xs text-muted-foreground">
               <p>
-                Para solicitar a exclusão definitiva de todos os seus dados e encerramento da conta, entre em contato através da tela de suporte ou utilize o botão abaixo com confirmação estrita.
+                Para solicitar a exclusão definitiva de todos os seus dados e encerramento da conta,
+                entre em contato através da tela de suporte ou utilize o botão abaixo com
+                confirmação estrita.
               </p>
             </CardContent>
           </Card>
@@ -665,7 +686,8 @@ function Configuracoes() {
                           {count === 1 ? "movimentação" : "movimentações"}.
                         </p>
                         <p>
-                          Para não deixar seus lançamentos órfãos, escolha para qual categoria elas devem ser movidas antes de remover:
+                          Para não deixar seus lançamentos órfãos, escolha para qual categoria elas
+                          devem ser movidas antes de remover:
                         </p>
                         <div className="pt-1">
                           <Label className="text-xs">Mover movimentações para:</Label>
@@ -688,7 +710,8 @@ function Configuracoes() {
 
                   return (
                     <p>
-                      Esta categoria não possui nenhuma movimentação vinculada e pode ser removida com segurança.
+                      Esta categoria não possui nenhuma movimentação vinculada e pode ser removida
+                      com segurança.
                     </p>
                   );
                 })()}

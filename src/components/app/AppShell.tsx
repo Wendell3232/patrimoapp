@@ -22,6 +22,16 @@ import {
 } from "lucide-react";
 
 import { ThemeToggle } from "@/components/app/ThemeToggle";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useFinance, useRefreshFinance } from "@/lib/data";
@@ -84,6 +94,7 @@ export function AppShell({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data } = useFinance();
@@ -132,10 +143,7 @@ export function AppShell({
             mini && "px-2",
           )}
         >
-          <Link
-            to="/dashboard"
-            className="flex items-center gap-3 text-base font-semibold"
-          >
+          <Link to="/dashboard" className="flex items-center gap-3 text-base font-semibold">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-sidebar-primary text-sm font-bold text-sidebar-primary-foreground shadow-sm">
               P
             </span>
@@ -192,7 +200,7 @@ export function AppShell({
           <Button
             type="button"
             variant="ghost"
-            onClick={signOut}
+            onClick={() => setConfirmSignOut(true)}
             title="Sair da conta"
             className={cn(
               linkClass(false),
@@ -225,13 +233,15 @@ export function AppShell({
             onClick={() => setMenuOpen(false)}
             aria-hidden
           />
-          <div className="absolute inset-y-0 left-0 w-[min(290px,86vw)]">{renderSidebar(false)}</div>
+          <div className="absolute inset-y-0 left-0 w-[min(290px,86vw)]">
+            {renderSidebar(false)}
+          </div>
         </div>
       )}
 
       <div className="flex min-h-screen min-w-0 flex-col">
         <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/85">
-          <div className="flex min-h-[72px] items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
+          <div className="flex min-h-[72px] flex-wrap items-center gap-2 px-4 py-2.5 sm:px-6 lg:px-8">
             <Button
               type="button"
               variant="outline"
@@ -262,7 +272,7 @@ export function AppShell({
                 <p className="truncate text-[13px] text-muted-foreground">{description}</p>
               )}
             </div>
-            <div className="hidden items-center gap-2 md:flex">{actions}</div>
+            <div className="flex items-center gap-2">{actions}</div>
             <ThemeToggle />
             <Button asChild variant="ghost" size="icon" className="relative hidden sm:flex">
               <Link to="/notificacoes" aria-label="Notificações">
@@ -310,6 +320,29 @@ export function AppShell({
           </div>
         </nav>
       </div>
+
+      <AlertDialog open={confirmSignOut} onOpenChange={setConfirmSignOut}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <LogOut className="h-5 w-5 text-destructive" /> Sair da conta
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-left">
+              Tem certeza que deseja sair do seu acesso ao Patrimo? Você precisará entrar novamente
+              para continuar.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setConfirmSignOut(false)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => void signOut()}
+            >
+              Sair
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
