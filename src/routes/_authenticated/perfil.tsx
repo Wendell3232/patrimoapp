@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Calendar, Eye, EyeOff, Lock, User as UserIcon } from "lucide-react";
+import { Calendar, Eye, EyeOff, LifeBuoy, Lock, Mail, User as UserIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/app/AppShell";
@@ -191,6 +191,24 @@ function Perfil() {
                 </span>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <LifeBuoy className="h-5 w-5 text-primary" /> Suporte
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-xs">
+            <p className="text-muted-foreground leading-relaxed">
+              Precisa de ajuda com sua conta, pagamento ou uso do app? Estamos por e-mail.
+            </p>
+            <Button asChild size="sm" className="w-full">
+              <a href="mailto:suportepatrimo@gmail.com">
+                <Mail className="mr-1.5 h-4 w-4" /> Falar com o suporte
+              </a>
+            </Button>
           </CardContent>
         </Card>
 

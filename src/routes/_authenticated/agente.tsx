@@ -363,9 +363,6 @@ function Agente() {
                     </>
                   )}
                 </Button>
-                <p className="text-center text-[10px] text-muted-foreground">
-                  Ctrl+Enter para enviar · Usa somente os seus dados
-                </p>
               </div>
             </CardContent>
           </Card>
