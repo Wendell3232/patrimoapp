@@ -64,10 +64,7 @@ function Notificacoes() {
   }
 
   async function markSingleRead(id: string) {
-    const { error } = await supabase
-      .from("notifications")
-      .update({ read: true })
-      .eq("id", id);
+    const { error } = await supabase.from("notifications").update({ read: true }).eq("id", id);
     if (error) {
       toast.error("Não foi possível atualizar o aviso.");
       return;
@@ -117,7 +114,7 @@ function Notificacoes() {
               type="button"
               variant={filterLevel === tab.id ? "default" : "outline"}
               size="sm"
-              className="h-8 rounded-full text-xs font-medium"
+              className="h-9 rounded-full text-xs font-medium"
               onClick={() => setFilterLevel(tab.id)}
             >
               {tab.label}
@@ -132,11 +129,10 @@ function Notificacoes() {
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-positive/10 text-positive">
                 <ShieldCheck className="h-6 w-6" />
               </div>
-              <h3 className="font-semibold text-base text-foreground">
-                Tudo tranquilo por aqui!
-              </h3>
+              <h3 className="font-semibold text-base text-foreground">Tudo tranquilo por aqui!</h3>
               <p className="max-w-md text-xs text-muted-foreground leading-relaxed">
-                Vamos avisar quando uma fatura, orçamento ou conta futura precisar da sua atenção. Nenhum imprevisto detectado no momento.
+                Vamos avisar quando uma fatura, orçamento ou conta futura precisar da sua atenção.
+                Nenhum imprevisto detectado no momento.
               </p>
             </CardContent>
           </Card>
@@ -182,23 +178,7 @@ function Notificacoes() {
                         </div>
 
                         <div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <p className="font-semibold text-sm text-foreground">
-                              {n.title}
-                            </p>
-                            <Badge
-                              variant="outline"
-                              className={`text-[10px] ${
-                                isUrgente
-                                  ? "border-destructive/40 text-destructive bg-destructive/10"
-                                  : isAtencao
-                                    ? "border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10"
-                                    : "border-primary/40 text-primary bg-primary/10"
-                              }`}
-                            >
-                              {isUrgente ? "Urgente" : isAtencao ? "Atenção" : "Informativo"}
-                            </Badge>
-                          </div>
+                          <p className="font-semibold text-sm text-foreground">{n.title}</p>
                           <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
                             {n.body}
                           </p>
@@ -215,11 +195,11 @@ function Notificacoes() {
                             type="button"
                             variant="ghost"
                             size="sm"
-                            className="h-6 text-[11px] text-muted-foreground hover:text-foreground px-1.5"
+                            className="h-9 text-xs text-muted-foreground hover:text-foreground"
                             onClick={() => void markSingleRead(n.id)}
                             title="Marcar como lida"
                           >
-                            <Check className="mr-1 h-3 w-3" /> Marcar lida
+                            <Check className="mr-1 h-3.5 w-3.5" /> Marcar lida
                           </Button>
                         )}
                       </div>

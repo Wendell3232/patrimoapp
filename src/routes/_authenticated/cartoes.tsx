@@ -72,12 +72,14 @@ export const Route = createFileRoute("/_authenticated/cartoes")({
       { title: "Cartões — Patrimo" },
       {
         name: "description",
-        content: "Fatura atual, vencimentos, limite disponível e parcelas que virão nos seus cartões.",
+        content:
+          "Fatura atual, vencimentos, limite disponível e parcelas que virão nos seus cartões.",
       },
       { property: "og:title", content: "Cartões — Patrimo" },
       {
         property: "og:description",
-        content: "Fatura atual, vencimentos, limite disponível e parcelas que virão nos seus cartões.",
+        content:
+          "Fatura atual, vencimentos, limite disponível e parcelas que virão nos seus cartões.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -366,9 +368,7 @@ function Cartoes() {
               </div>
 
               {error && (
-                <p className="rounded-md bg-destructive/10 p-2 text-xs text-destructive">
-                  {error}
-                </p>
+                <p className="rounded-md bg-destructive/10 p-2 text-xs text-destructive">{error}</p>
               )}
             </div>
 
@@ -449,7 +449,7 @@ function Cartoes() {
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        className="h-9 w-9 text-muted-foreground hover:text-destructive"
                         title="Arquivar cartão"
                         onClick={() => setArchiving(card)}
                       >
@@ -523,7 +523,8 @@ function Cartoes() {
                         Confirmar pagamento da fatura de {formatBRL(openInvoice)}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Ao pagar, o valor é debitado da sua conta bancária e o limite do cartão é restaurado na hora.
+                        Ao pagar, o valor é debitado da sua conta bancária e o limite do cartão é
+                        restaurado na hora.
                       </p>
                     </div>
                     <Button
@@ -564,7 +565,10 @@ function Cartoes() {
                                     {inv.label}
                                   </span>
                                   {isCurrent && (
-                                    <Badge variant="outline" className="text-[10px] border-primary/40 text-primary">
+                                    <Badge
+                                      variant="outline"
+                                      className="text-[10px] border-primary/40 text-primary"
+                                    >
                                       Fatura atual
                                     </Badge>
                                   )}
@@ -603,9 +607,7 @@ function Cartoes() {
       <Dialog open={payingCard !== null} onOpenChange={(o) => !o && setPayingCard(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>
-              Confirmar pagamento da fatura — {payingCard?.name}
-            </DialogTitle>
+            <DialogTitle>Confirmar pagamento da fatura — {payingCard?.name}</DialogTitle>
             <DialogDescription>
               Informe o valor e a conta bancária para debitar o pagamento.
             </DialogDescription>
@@ -634,7 +636,8 @@ function Cartoes() {
                       .filter((a) => !a.archived)
                       .map((account) => (
                         <SelectItem key={account.id} value={account.id}>
-                          {account.name} (Saldo: {formatBRL(accountBalance(account, data.transactions))})
+                          {account.name} (Saldo:{" "}
+                          {formatBRL(accountBalance(account, data.transactions))})
                         </SelectItem>
                       ))}
                   </SelectContent>
@@ -697,10 +700,7 @@ function Cartoes() {
       </Dialog>
 
       {/* DIALOG DE DETALHES DA FATURA */}
-      <Dialog
-        open={viewingInvoice !== null}
-        onOpenChange={(o) => !o && setViewingInvoice(null)}
-      >
+      <Dialog open={viewingInvoice !== null} onOpenChange={(o) => !o && setViewingInvoice(null)}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -708,7 +708,10 @@ function Cartoes() {
               Fatura de {viewingInvoice?.invoice.label} — {viewingInvoice?.card.name}
             </DialogTitle>
             <DialogDescription>
-              Total da fatura: <strong className="text-foreground">{formatBRL(viewingInvoice?.invoice.total ?? 0)}</strong>
+              Total da fatura:{" "}
+              <strong className="text-foreground">
+                {formatBRL(viewingInvoice?.invoice.total ?? 0)}
+              </strong>
             </DialogDescription>
           </DialogHeader>
 
@@ -829,14 +832,13 @@ function Cartoes() {
           <AlertDialogHeader>
             <AlertDialogTitle>Arquivar cartão "{archiving?.name}"?</AlertDialogTitle>
             <AlertDialogDescription>
-              O cartão não aparecerá para novas despesas, mas todas as compras parceladas e faturas passadas continuarão guardadas no seu histórico.
+              O cartão não aparecerá para novas despesas, mas todas as compras parceladas e faturas
+              passadas continuarão guardadas no seu histórico.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setArchiving(null)}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => void archive()}>
-              Arquivar cartão
-            </AlertDialogAction>
+            <AlertDialogAction onClick={() => void archive()}>Arquivar cartão</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

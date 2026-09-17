@@ -52,12 +52,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { useFinance, useRefreshFinance } from "@/lib/data";
 import {
@@ -303,161 +298,163 @@ function Contas() {
           <div>
             <p className="font-semibold text-primary">Saldo disponível de verdade</p>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              É o dinheiro que sobra nas suas contas depois de considerar os pagamentos, contas futuras e faturas de cartão que já estão previstos para os próximos 30 dias.
+              É o dinheiro que sobra nas suas contas depois de considerar os pagamentos, contas
+              futuras e faturas de cartão que já estão previstos para os próximos 30 dias.
             </p>
           </div>
         </div>
 
         {/* CARDS DAS CONTAS */}
         <TooltipProvider delayDuration={100}>
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {activeAccounts.map((account) => {
-            const avail = accountAvailability(
-              account,
-              data.transactions,
-              data.commitments,
-              data.cards,
-              30,
-            );
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {activeAccounts.map((account) => {
+              const avail = accountAvailability(
+                account,
+                data.transactions,
+                data.commitments,
+                data.cards,
+                30,
+              );
 
-            // Informações de atividade recente
-            const txsOfAccount = data.transactions.filter(
-              (t) => t.account_id === account.id || t.to_account_id === account.id,
-            );
-            const sortedTxs = [...txsOfAccount].sort((a, b) =>
-              b.occurred_on.localeCompare(a.occurred_on),
-            );
-            const lastTx = sortedTxs[0];
-            const recentCount = txsOfAccount.filter(
-              (t) =>
-                t.occurred_on >=
-                toISODate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)),
-            ).length;
+              // Informações de atividade recente
+              const txsOfAccount = data.transactions.filter(
+                (t) => t.account_id === account.id || t.to_account_id === account.id,
+              );
+              const sortedTxs = [...txsOfAccount].sort((a, b) =>
+                b.occurred_on.localeCompare(a.occurred_on),
+              );
+              const lastTx = sortedTxs[0];
+              const recentCount = txsOfAccount.filter(
+                (t) => t.occurred_on >= toISODate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)),
+              ).length;
 
-            return (
-              <Card
-                key={account.id}
-                className="flex flex-col justify-between transition-shadow hover:shadow-md"
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <CardTitle className="truncate text-base font-bold">
-                        {account.name}
-                      </CardTitle>
-                      <CardDescription className="text-xs">
-                        {account.institution ? `${account.institution} • ` : ""}
-                        {ACCOUNT_TYPE_LABEL[account.type]}
-                      </CardDescription>
+              return (
+                <Card
+                  key={account.id}
+                  className="flex flex-col justify-between transition-shadow hover:shadow-md"
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <CardTitle className="truncate text-base font-bold">
+                          {account.name}
+                        </CardTitle>
+                        <CardDescription className="text-xs">
+                          {account.institution ? `${account.institution} • ` : ""}
+                          {ACCOUNT_TYPE_LABEL[account.type]}
+                        </CardDescription>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-9 w-9 text-muted-foreground hover:text-foreground"
+                          title="Editar conta"
+                          onClick={() => {
+                            setEditing(account);
+                            setEditName(account.name);
+                            setEditType(account.type);
+                            setEditInstitution(account.institution ?? "");
+                            setEditBalance(account.opening_balance);
+                            setEditError(null);
+                          }}
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-9 w-9 text-muted-foreground hover:text-destructive"
+                          title="Arquivar conta"
+                          onClick={() => setArchiving(account)}
+                        >
+                          <Archive className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                        title="Editar conta"
-                        onClick={() => {
-                          setEditing(account);
-                          setEditName(account.name);
-                          setEditType(account.type);
-                          setEditInstitution(account.institution ?? "");
-                          setEditBalance(account.opening_balance);
-                          setEditError(null);
-                        }}
-                      >
-                        <Pencil className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                        title="Arquivar conta"
-                        onClick={() => setArchiving(account)}
-                      >
-                        <Archive className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
+                  </CardHeader>
 
-                <CardContent className="space-y-4">
-                  {/* Métricas de Saldo */}
-                  <div className="rounded-lg bg-accent/40 p-3 space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">Saldo atual registrado:</span>
-                      <span className="font-semibold text-foreground tabular">
-                        {formatBRL(avail.currentBalance)}
-                      </span>
-                    </div>
-
-                    {avail.committedAmount > 0 && (
+                  <CardContent className="space-y-4">
+                    {/* Métricas de Saldo */}
+                    <div className="rounded-lg bg-accent/40 p-3 space-y-2">
                       <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">Saldo atual registrado:</span>
+                        <span className="font-semibold text-foreground tabular">
+                          {formatBRL(avail.currentBalance)}
+                        </span>
+                      </div>
+
+                      {avail.committedAmount > 0 && (
+                        <div className="flex items-center justify-between text-xs">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="text-muted-foreground cursor-help border-b border-dotted border-border">
+                                Comprometido (30 dias):
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" align="start">
+                              Pagamentos, contas e faturas de cartão já previstos para sair desta
+                              conta nos próximos 30 dias.
+                            </TooltipContent>
+                          </Tooltip>
+                          <span className="font-medium text-destructive tabular">
+                            - {formatBRL(avail.committedAmount)}
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="border-t border-border/60 pt-1.5 flex items-center justify-between">
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="text-muted-foreground cursor-help border-b border-dotted border-border">
-                              Comprometido (30 dias):
+                            <span className="text-xs font-semibold text-foreground cursor-help border-b border-dotted border-border">
+                              Disponível de verdade:
                             </span>
                           </TooltipTrigger>
                           <TooltipContent side="bottom" align="start">
-                            Pagamentos, contas e faturas de cartão já previstos para sair desta conta nos próximos 30 dias.
+                            Saldo atual menos os valores comprometidos: é o quanto você pode usar
+                            sem comprometer seus pagamentos dos próximos 30 dias.
                           </TooltipContent>
                         </Tooltip>
-                        <span className="font-medium text-destructive tabular">
-                          - {formatBRL(avail.committedAmount)}
+                        <span
+                          className={`text-base font-bold tabular ${
+                            avail.availableBalance >= 0 ? "text-positive" : "text-destructive"
+                          }`}
+                        >
+                          {formatBRL(avail.availableBalance)}
                         </span>
                       </div>
-                    )}
-
-                    <div className="border-t border-border/60 pt-1.5 flex items-center justify-between">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span className="text-xs font-semibold text-foreground cursor-help border-b border-dotted border-border">
-                            Disponível de verdade:
-                          </span>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom" align="start">
-                          Saldo atual menos os valores comprometidos: é o quanto você pode usar sem comprometer seus pagamentos dos próximos 30 dias.
-                        </TooltipContent>
-                      </Tooltip>
-                      <span
-                        className={`text-base font-bold tabular ${
-                          avail.availableBalance >= 0 ? "text-positive" : "text-destructive"
-                        }`}
-                      >
-                        {formatBRL(avail.availableBalance)}
-                      </span>
                     </div>
-                  </div>
 
-                  {/* Informações de Atividade */}
-                  <div className="space-y-1 text-xs text-muted-foreground">
-                    <p className="flex items-center gap-1.5">
-                      <Clock className="h-3.5 w-3.5 shrink-0" />
-                      {lastTx
-                        ? `Última movimentação em ${formatDate(lastTx.occurred_on)}`
-                        : "Sem movimentações registradas"}
-                    </p>
-                    <p className="text-[11px]">
-                      {recentCount} {recentCount === 1 ? "movimentação" : "movimentações"} nos últimos 30 dias
-                    </p>
-                  </div>
+                    {/* Informações de Atividade */}
+                    <div className="space-y-1 text-xs text-muted-foreground">
+                      <p className="flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5 shrink-0" />
+                        {lastTx
+                          ? `Última movimentação em ${formatDate(lastTx.occurred_on)}`
+                          : "Sem movimentações registradas"}
+                      </p>
+                      <p className="text-[11px]">
+                        {recentCount} {recentCount === 1 ? "movimentação" : "movimentações"} nos
+                        últimos 30 dias
+                      </p>
+                    </div>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="w-full text-xs"
-                    onClick={() => setViewingHistoryAccount(account)}
-                  >
-                    <History className="mr-1.5 h-3.5 w-3.5" /> Ver histórico detalhado
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-xs"
+                      onClick={() => setViewingHistoryAccount(account)}
+                    >
+                      <History className="mr-1.5 h-3.5 w-3.5" /> Ver histórico detalhado
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </TooltipProvider>
       </div>
 
@@ -486,7 +483,8 @@ function Contas() {
               accountHistory.map((tx) => {
                 const isTransfer = tx.kind === "transferencia";
                 const isTransferSent = isTransfer && tx.account_id === viewingHistoryAccount?.id;
-                const isTransferReceived = isTransfer && tx.to_account_id === viewingHistoryAccount?.id;
+                const isTransferReceived =
+                  isTransfer && tx.to_account_id === viewingHistoryAccount?.id;
 
                 const otherAccount = isTransferSent
                   ? data.accounts.find((a) => a.id === tx.to_account_id)
@@ -509,7 +507,8 @@ function Contas() {
                         {formatDate(tx.occurred_on)}
                         {isTransfer && (
                           <span className="ml-2 inline-flex items-center text-[10px] text-primary">
-                            <ArrowLeftRight className="mr-0.5 h-3 w-3" /> Transferência interna (não afeta ganhos/gastos)
+                            <ArrowLeftRight className="mr-0.5 h-3 w-3" /> Transferência interna (não
+                            afeta ganhos/gastos)
                           </span>
                         )}
                       </p>
@@ -526,7 +525,13 @@ function Contas() {
                                 : "text-destructive"
                         }`}
                       >
-                        {isTransferSent ? "- " : isTransferReceived ? "+ " : tx.kind === "despesa" ? "- " : "+ "}
+                        {isTransferSent
+                          ? "- "
+                          : isTransferReceived
+                            ? "+ "
+                            : tx.kind === "despesa"
+                              ? "- "
+                              : "+ "}
                         {formatBRL(tx.amount)}
                       </span>
                     </div>
@@ -619,14 +624,13 @@ function Contas() {
           <AlertDialogHeader>
             <AlertDialogTitle>Arquivar conta "{archiving?.name}"?</AlertDialogTitle>
             <AlertDialogDescription>
-              A conta deixará de ser exibida nas listas ativas, mas todos os lançamentos e transferências passados continuarão preservados no seu histórico.
+              A conta deixará de ser exibida nas listas ativas, mas todos os lançamentos e
+              transferências passados continuarão preservados no seu histórico.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setArchiving(null)}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => void archive()}>
-              Arquivar conta
-            </AlertDialogAction>
+            <AlertDialogAction onClick={() => void archive()}>Arquivar conta</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

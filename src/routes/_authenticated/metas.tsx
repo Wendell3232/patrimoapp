@@ -2,18 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   AlertCircle,
-  Calendar,
   CheckCircle2,
   Clock,
   Edit2,
+  MoreVertical,
   Pause,
   PiggyBank,
   Play,
   Plus,
-  Target,
   Trash2,
-  TrendingUp,
-  Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -41,6 +38,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
@@ -121,7 +125,9 @@ function Metas() {
       const next = prev.includes(goalId) ? prev.filter((id) => id !== goalId) : [...prev, goalId];
       try {
         localStorage.setItem("patrimo_paused_goals", JSON.stringify(next));
-      } catch {}
+      } catch {
+        return next;
+      }
       return next;
     });
     const isPaused = !pausedIds.includes(goalId);
@@ -353,9 +359,7 @@ function Metas() {
               </div>
 
               {error && (
-                <p className="rounded-md bg-destructive/10 p-2 text-xs text-destructive">
-                  {error}
-                </p>
+                <p className="rounded-md bg-destructive/10 p-2 text-xs text-destructive">{error}</p>
               )}
             </div>
 
@@ -375,7 +379,8 @@ function Metas() {
         {data.goals.length === 0 ? (
           <Card>
             <CardContent className="p-12 text-center text-sm text-muted-foreground">
-              Nenhuma meta cadastrada ainda. Clique em "Nova meta" para planejar seu próximo objetivo!
+              Nenhuma meta cadastrada ainda. Clique em "Nova meta" para planejar seu próximo
+              objetivo!
             </CardContent>
           </Card>
         ) : (
@@ -383,7 +388,6 @@ function Metas() {
             {data.goals.map((goal) => {
               const pacing = goalPacing(goal);
               const isPaused = pausedIds.includes(goal.id);
-              const linkedAccount = data.accounts.find((a) => a.id === goal.account_id);
               const targetDateFormatted = formatMonthLabel(parseISODate(goal.target_date));
 
               // Status visual
@@ -414,7 +418,8 @@ function Metas() {
               } else if (pacing.status === "atencao") {
                 statusBadge = {
                   label: "Atenção",
-                  className: "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400",
+                  className:
+                    "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400",
                   icon: Clock,
                 };
               }
@@ -433,7 +438,10 @@ function Metas() {
                           <CardTitle className="truncate text-base font-bold">
                             {goal.name}
                           </CardTitle>
-                          <Badge variant="outline" className={`text-xs gap-1 ${statusBadge.className}`}>
+                          <Badge
+                            variant="outline"
+                            className={`text-xs gap-1 ${statusBadge.className}`}
+                          >
                             <statusBadge.icon className="h-3 w-3" />
                             {statusBadge.label}
                           </Badge>
@@ -444,38 +452,48 @@ function Metas() {
                         </CardDescription>
                       </div>
 
-                      <div className="flex items-center gap-1">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                          title={isPaused ? "Reativar meta" : "Pausar meta"}
-                          onClick={() => togglePause(goal.id)}
-                        >
-                          {isPaused ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                          title="Editar meta"
-                          onClick={() => startEdit(goal)}
-                        >
-                          <Edit2 className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                          title="Excluir meta"
-                          onClick={() => setRemoving(goal)}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 text-muted-foreground hover:text-foreground"
+                            title="Ações da meta"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-44">
+                          <DropdownMenuItem
+                            className="cursor-pointer font-medium"
+                            onClick={() => togglePause(goal.id)}
+                          >
+                            {isPaused ? (
+                              <>
+                                <Play className="h-4 w-4" /> Reativar meta
+                              </>
+                            ) : (
+                              <>
+                                <Pause className="h-4 w-4" /> Pausar meta
+                              </>
+                            )}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={() => startEdit(goal)}
+                          >
+                            <Edit2 className="h-4 w-4" /> Editar meta
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="cursor-pointer text-destructive focus:text-destructive"
+                            onClick={() => setRemoving(goal)}
+                          >
+                            <Trash2 className="h-4 w-4" /> Excluir meta
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </CardHeader>
 
@@ -484,49 +502,51 @@ function Metas() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-muted-foreground">
-                          Guardado: <strong className="text-foreground tabular">{formatBRL(pacing.current)}</strong>
+                          Guardado:{" "}
+                          <strong className="text-foreground tabular">
+                            {formatBRL(pacing.current)} ({pacing.percentage.toFixed(0)}%)
+                          </strong>
                         </span>
                         <span className="text-muted-foreground">
-                          Alvo: <strong className="text-foreground tabular">{formatBRL(pacing.target)}</strong>
+                          Alvo:{" "}
+                          <strong className="text-foreground tabular">
+                            {formatBRL(pacing.target)}
+                          </strong>
                         </span>
                       </div>
 
                       <Progress value={pacing.percentage} />
 
-                      <div className="flex items-center justify-between text-xs pt-0.5">
-                        <span className="font-semibold text-primary">{pacing.percentage.toFixed(0)}% concluído</span>
-                        <span className="text-muted-foreground">Faltam {formatBRL(pacing.missing)}</span>
-                      </div>
-                    </div>
-
-                    {/* Explicações Acolhedoras e Recomendações */}
-                    <div className="rounded-lg bg-accent/40 p-3 text-xs text-foreground space-y-1.5">
-                      {pacing.percentage >= 100 ? (
-                        <p className="font-semibold text-positive">
-                          Parabéns! Você alcançou o valor desejado para esta meta!
-                        </p>
-                      ) : isPaused ? (
-                        <p className="text-muted-foreground">
-                          Esta meta está pausada. Ela não gerará cobranças ou alertas até ser reativada.
-                        </p>
-                      ) : (
-                        <>
-                          <p>
-                            Para chegar até <strong>{targetDateFormatted}</strong>, você precisa guardar{" "}
-                            <strong className="text-primary">{formatBRL(pacing.monthlyNeeded)}</strong> por mês.
-                          </p>
-                          {pacing.status === "atrasada" && (
-                            <p className="text-destructive font-medium">
-                              Você está abaixo do ritmo necessário. Se preferir, pode ajustar o prazo ou o valor alvo.
-                            </p>
-                          )}
-                        </>
-                      )}
-                      {linkedAccount && (
-                        <p className="text-[11px] text-muted-foreground pt-1 border-t border-border/50">
-                          Vinculada à conta: {linkedAccount.name}
-                        </p>
-                      )}
+                      <p className="text-xs">
+                        {pacing.percentage >= 100 ? (
+                          <span className="font-medium text-positive">
+                            Parabéns! Você alcançou o valor desejado para esta meta!
+                          </span>
+                        ) : isPaused ? (
+                          <span className="text-muted-foreground">
+                            Meta pausada temporariamente. Reative quando quiser retomar.
+                          </span>
+                        ) : (
+                          <>
+                            <span className="text-muted-foreground">
+                              Faltam{" "}
+                              <strong className="text-foreground tabular">
+                                {formatBRL(pacing.missing)}
+                              </strong>{" "}
+                              — guardar{" "}
+                              <strong className="text-primary tabular">
+                                {formatBRL(pacing.monthlyNeeded)}
+                              </strong>{" "}
+                              por mês.
+                            </span>
+                            {pacing.status === "atrasada" && (
+                              <span className="mt-0.5 block font-medium text-destructive">
+                                Você está abaixo do ritmo: ajuste o prazo ou o valor alvo.
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </p>
                     </div>
 
                     {/* Botão para registrar valor guardado */}
@@ -534,7 +554,7 @@ function Metas() {
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="w-full text-xs font-medium"
+                      className="w-full text-xs font-medium h-9"
                       onClick={() => {
                         setDepositing(goal);
                         setDepositAmount(null);
@@ -592,7 +612,7 @@ function Metas() {
                   <div className="pt-2 space-y-1.5">
                     <Label className="text-xs">Conta de origem</Label>
                     <Select value={depositAccount} onValueChange={setDepositAccount}>
-                      <SelectTrigger className="h-8 text-xs">
+                      <SelectTrigger className="h-9 text-xs">
                         <SelectValue placeholder="Escolha a conta" />
                       </SelectTrigger>
                       <SelectContent>
@@ -712,14 +732,13 @@ function Metas() {
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir meta "{removing?.name}"?</AlertDialogTitle>
             <AlertDialogDescription>
-              A meta será removida. Os saldos e movimentações das suas contas bancárias permanecerão intactos.
+              A meta será removida. Os saldos e movimentações das suas contas bancárias permanecerão
+              intactos.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setRemoving(null)}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => void remove()}>
-              Excluir meta
-            </AlertDialogAction>
+            <AlertDialogAction onClick={() => void remove()}>Excluir meta</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -66,12 +66,14 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { title: "Visão Geral — Patrimo" },
       {
         name: "description",
-        content: "Tudo o que você tem nas contas, o que entrou, o que saiu e suas próximas atenções.",
+        content:
+          "Tudo o que você tem nas contas, o que entrou, o que saiu e suas próximas atenções.",
       },
       { property: "og:title", content: "Visão Geral — Patrimo" },
       {
         property: "og:description",
-        content: "Tudo o que você tem nas contas, o que entrou, o que saiu e suas próximas atenções.",
+        content:
+          "Tudo o que você tem nas contas, o que entrou, o que saiu e suas próximas atenções.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -286,9 +288,7 @@ function Dashboard() {
     );
   }
 
-  const activeUnusual = view.unusual.filter(
-    (u) => !dismissedAlerts.includes(u.transaction.id),
-  );
+  const activeUnusual = view.unusual.filter((u) => !dismissedAlerts.includes(u.transaction.id));
 
   const showAttention = view.nextAttention.type !== "ok";
 
@@ -309,19 +309,21 @@ function Dashboard() {
         </div>
 
         {/* 1. TOPO: APENAS OS CARDS PRINCIPAIS */}
-        <div className={showAttention ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3" : "grid gap-4 sm:grid-cols-2"}>
+        <div
+          className={
+            showAttention ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3" : "grid gap-4 sm:grid-cols-2"
+          }
+        >
           {/* Card 1: Meu dinheiro hoje */}
           <Card className="relative flex flex-col justify-between border-primary/20 bg-gradient-to-br from-card to-card/90 shadow-sm">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Meu dinheiro hoje
-                </span>
+                <span className="text-xs font-medium text-muted-foreground">Meu dinheiro hoje</span>
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
                   onClick={() => setHelpOpen(true)}
                   title="O que é isso?"
                 >
@@ -340,7 +342,7 @@ function Dashboard() {
           <Card className="relative flex flex-col justify-between shadow-sm">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <span className="text-xs font-medium text-muted-foreground">
                   Como foi o período ({period.label})
                 </span>
                 <Badge
@@ -351,7 +353,8 @@ function Dashboard() {
                       : "border-destructive/30 bg-destructive/10 text-destructive"
                   }
                 >
-                  {view.totals.result >= 0 ? "Sobrou" : "Faltou"} {formatBRL(Math.abs(view.totals.result))}
+                  {view.totals.result >= 0 ? "Sobrou" : "Faltou"}{" "}
+                  {formatBRL(Math.abs(view.totals.result))}
                 </Badge>
               </div>
               <div className="mt-2 grid grid-cols-2 gap-3 text-sm">
@@ -381,16 +384,12 @@ function Dashboard() {
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2">
                   <AlertCircle className="h-4 w-4 text-amber-500" />
-                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <span className="text-xs font-medium text-muted-foreground">
                     Sua próxima atenção
                   </span>
                 </div>
-                <p className="mt-1 font-semibold text-foreground">
-                  {view.nextAttention.title}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {view.nextAttention.description}
-                </p>
+                <p className="mt-1 font-semibold text-foreground">{view.nextAttention.title}</p>
+                <p className="text-xs text-muted-foreground">{view.nextAttention.description}</p>
               </CardHeader>
               <CardContent className="pt-0">
                 <Button asChild size="sm" variant="outline" className="w-full justify-between">
@@ -419,7 +418,12 @@ function Dashboard() {
                       Gasto pontual expressivo em {item.categoryName}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      A despesa de <strong className="text-foreground">{formatBRL(item.transaction.amount)}</strong> ("{item.transaction.description}") é {item.differenceFactor}x maior que a média dos outros gastos deste período.
+                      A despesa de{" "}
+                      <strong className="text-foreground">
+                        {formatBRL(item.transaction.amount)}
+                      </strong>{" "}
+                      ("{item.transaction.description}") é {item.differenceFactor}x maior que a
+                      média dos outros gastos deste período.
                     </p>
                   </div>
                 </div>
@@ -440,9 +444,7 @@ function Dashboard() {
                     size="sm"
                     variant="ghost"
                     className="text-xs text-muted-foreground"
-                    onClick={() =>
-                      setDismissedAlerts((prev) => [...prev, item.transaction.id])
-                    }
+                    onClick={() => setDismissedAlerts((prev) => [...prev, item.transaction.id])}
                   >
                     <X className="mr-1 h-3.5 w-3.5" /> Está correto
                   </Button>
@@ -461,7 +463,7 @@ function Dashboard() {
                 <div>
                   <CardTitle className="text-base">Distribuição entre contas</CardTitle>
                 </div>
-                <Button asChild variant="ghost" size="sm" className="h-8 text-xs">
+                <Button asChild variant="ghost" size="sm" className="h-9 text-xs">
                   <Link to="/contas">Ver contas</Link>
                 </Button>
               </div>
@@ -481,9 +483,7 @@ function Dashboard() {
                   </div>
                   <Progress
                     value={
-                      view.worthTotal > 0
-                        ? Math.max((item.balance / view.worthTotal) * 100, 0)
-                        : 0
+                      view.worthTotal > 0 ? Math.max((item.balance / view.worthTotal) * 100, 0) : 0
                     }
                   />
                   <p className="text-xs text-muted-foreground">
@@ -501,7 +501,7 @@ function Dashboard() {
                 <div>
                   <CardTitle className="text-base">Principais gastos</CardTitle>
                 </div>
-                <Button asChild variant="ghost" size="sm" className="h-8 text-xs">
+                <Button asChild variant="ghost" size="sm" className="h-9 text-xs">
                   <Link to="/movimentacoes">Ver detalhes</Link>
                 </Button>
               </div>
@@ -646,8 +646,18 @@ function Dashboard() {
                     fontSize={11}
                   />
                   <Tooltip formatter={(value: number) => formatBRL(Number(value))} />
-                  <Bar dataKey="receitas" fill="var(--positive)" radius={[4, 4, 0, 0]} name="Entradas" />
-                  <Bar dataKey="despesas" fill="var(--destructive)" radius={[4, 4, 0, 0]} name="Saídas" />
+                  <Bar
+                    dataKey="receitas"
+                    fill="var(--positive)"
+                    radius={[4, 4, 0, 0]}
+                    name="Entradas"
+                  />
+                  <Bar
+                    dataKey="despesas"
+                    fill="var(--destructive)"
+                    radius={[4, 4, 0, 0]}
+                    name="Saídas"
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -682,7 +692,7 @@ function Dashboard() {
             <div>
               <CardTitle className="text-base">Últimas movimentações</CardTitle>
             </div>
-            <Button asChild variant="outline" size="sm" className="h-8 text-xs">
+            <Button asChild variant="outline" size="sm" className="h-9 text-xs">
               <Link to="/movimentacoes">Ver todas</Link>
             </Button>
           </CardHeader>
@@ -706,7 +716,9 @@ function Dashboard() {
                       <p className="text-xs text-muted-foreground">
                         {formatDayMonth(tx.occurred_on)}
                         {category ? ` — ${category.name}` : ""}
-                        {tx.installment_total ? ` (${tx.installment_number}/${tx.installment_total})` : ""}
+                        {tx.installment_total
+                          ? ` (${tx.installment_number}/${tx.installment_total})`
+                          : ""}
                       </p>
                     </div>
                     <span
@@ -734,18 +746,21 @@ function Dashboard() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Wallet className="h-5 w-5 text-primary" />
-              O que é "Meu dinheiro hoje"?
+              <Wallet className="h-5 w-5 text-primary" />O que é "Meu dinheiro hoje"?
             </DialogTitle>
             <DialogDescription className="text-left text-sm text-muted-foreground pt-2 space-y-3">
               <p>
-                É o <strong>saldo real acumulado</strong> somando todas as suas contas bancárias ativas (conta corrente, poupança, dinheiro em carteira e investimentos).
+                É o <strong>saldo real acumulado</strong> somando todas as suas contas bancárias
+                ativas (conta corrente, poupança, dinheiro em carteira e investimentos).
               </p>
               <p>
-                <strong>Importante:</strong> Não inclui o limite dos seus cartões de crédito. No Patrimo, limite de cartão é crédito emprestado pelo banco, e não dinheiro que você possui.
+                <strong>Importante:</strong> Não inclui o limite dos seus cartões de crédito. No
+                Patrimo, limite de cartão é crédito emprestado pelo banco, e não dinheiro que você
+                possui.
               </p>
               <p>
-                Conforme você adiciona receitas, faz pagamentos ou transfere dinheiro entre contas, este valor se atualiza instantaneamente.
+                Conforme você adiciona receitas, faz pagamentos ou transfere dinheiro entre contas,
+                este valor se atualiza instantaneamente.
               </p>
             </DialogDescription>
           </DialogHeader>

@@ -11,18 +11,16 @@ import {
   FolderOpen,
   Laptop,
   Moon,
-  Pencil,
+  MoreVertical,
   Plus,
   Settings,
   ShieldCheck,
   Sun,
-  Trash2,
   Upload,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/app/AppShell";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -44,6 +42,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -368,51 +373,54 @@ function Configuracoes() {
 
                   return (
                     <div key={cat.id} className="flex items-center justify-between py-3 text-sm">
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex min-w-0 items-center gap-2.5">
                         <span
                           className="h-3 w-3 rounded-full shrink-0"
                           style={{ backgroundColor: cat.color }}
                         />
-                        <div>
+                        <div className="min-w-0">
                           <span className="font-semibold text-foreground">{cat.name}</span>
                           <span className="ml-2 text-xs text-muted-foreground">
-                            ({txCount} {txCount === 1 ? "movimentação" : "movimentações"})
+                            {txCount} {txCount === 1 ? "movimentação" : "movimentações"}
                           </span>
                         </div>
-                        <Badge variant="outline" className="text-[10px] capitalize">
-                          {cat.kind === "despesa" ? "Despesa" : "Receita"}
-                        </Badge>
                       </div>
 
-                      <div className="flex items-center gap-1">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                          title="Editar categoria"
-                          onClick={() => {
-                            setEditingCat(cat);
-                            setEditCatName(cat.name);
-                            setEditCatKind(cat.kind);
-                          }}
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                          title="Remover categoria"
-                          onClick={() => {
-                            setRemovingCat(cat);
-                            setReassignCatId("");
-                          }}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 text-muted-foreground hover:text-foreground"
+                            title="Ações da categoria"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-44">
+                          <DropdownMenuItem
+                            className="cursor-pointer font-medium"
+                            onClick={() => {
+                              setEditingCat(cat);
+                              setEditCatName(cat.name);
+                              setEditCatKind(cat.kind);
+                            }}
+                          >
+                            <Edit2 className="h-4 w-4" /> Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="cursor-pointer text-destructive focus:text-destructive"
+                            onClick={() => {
+                              setRemovingCat(cat);
+                              setReassignCatId("");
+                            }}
+                          >
+                            Remover
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   );
                 })}

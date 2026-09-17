@@ -85,7 +85,7 @@ export function PeriodSelector({
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7"
+            className="h-8 w-8"
             aria-label="Período anterior"
             onClick={() =>
               onAnchorChange(
@@ -103,7 +103,7 @@ export function PeriodSelector({
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7"
+            className="h-8 w-8"
             aria-label="Próximo período"
             onClick={() =>
               onAnchorChange(

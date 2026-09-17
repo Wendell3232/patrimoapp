@@ -77,12 +77,14 @@ export const Route = createFileRoute("/_authenticated/relatorios")({
       { title: "Relatórios — Patrimo" },
       {
         name: "description",
-        content: "Investigue detalhes, compare períodos, exporte relatórios e analise a evolução dos seus gastos.",
+        content:
+          "Investigue detalhes, compare períodos, exporte relatórios e analise a evolução dos seus gastos.",
       },
       { property: "og:title", content: "Relatórios — Patrimo" },
       {
         property: "og:description",
-        content: "Investigue detalhes, compare períodos, exporte relatórios e analise a evolução dos seus gastos.",
+        content:
+          "Investigue detalhes, compare períodos, exporte relatórios e analise a evolução dos seus gastos.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -128,7 +130,11 @@ function Relatorios() {
     return data.transactions.filter((tx) => {
       if (tx.occurred_on < period.start || tx.occurred_on > period.end) return false;
       if (!includeTransfers && tx.kind === "transferencia") return false;
-      if (filterAccount !== "todas" && tx.account_id !== filterAccount && tx.to_account_id !== filterAccount)
+      if (
+        filterAccount !== "todas" &&
+        tx.account_id !== filterAccount &&
+        tx.to_account_id !== filterAccount
+      )
         return false;
       if (filterCard !== "todos" && tx.credit_card_id !== filterCard) return false;
       if (filterCategory !== "todas" && tx.category_id !== filterCategory) return false;
@@ -153,7 +159,8 @@ function Relatorios() {
   const previousTransactions = useMemo(() => {
     if (!data) return [];
     return data.transactions.filter((tx) => {
-      if (tx.occurred_on < period.previous.start || tx.occurred_on > period.previous.end) return false;
+      if (tx.occurred_on < period.previous.start || tx.occurred_on > period.previous.end)
+        return false;
       if (!includeTransfers && tx.kind === "transferencia") return false;
       return true;
     });
@@ -198,7 +205,12 @@ function Relatorios() {
   // Categorias do período anterior para identificar as que mais cresceram
   const prevByCategory = useMemo(() => {
     if (!data) return [];
-    return expensesByCategory(previousTransactions, data.categories, period.previous.start, period.previous.end);
+    return expensesByCategory(
+      previousTransactions,
+      data.categories,
+      period.previous.start,
+      period.previous.end,
+    );
   }, [previousTransactions, data, period]);
 
   const topGrowingCategories = useMemo(() => {
@@ -237,7 +249,8 @@ function Relatorios() {
       ].join(",");
     });
 
-    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(","), ...rows].join("\n");
+    const csvContent =
+      "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(","), ...rows].join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -288,22 +301,7 @@ Gerado no Patrimo Brasil`;
   }
 
   return (
-    <AppShell
-      title="Relatórios"
-      actions={
-        <div className="flex flex-wrap items-center gap-2">
-          <Button size="sm" variant="outline" onClick={copyTextSummary} title="Copiar resumo textual">
-            <Copy className="mr-1.5 h-4 w-4" /> Copiar resumo
-          </Button>
-          <Button size="sm" variant="outline" onClick={exportCSV} title="Baixar planilha CSV">
-            <FileSpreadsheet className="mr-1.5 h-4 w-4" /> Exportar CSV
-          </Button>
-          <Button size="sm" variant="outline" onClick={() => window.print()} title="Imprimir ou salvar em PDF">
-            <Printer className="mr-1.5 h-4 w-4" /> Imprimir / PDF
-          </Button>
-        </div>
-      }
-    >
+    <AppShell title="Relatórios">
       <div className="space-y-6">
         {/* SELETOR DE PERÍODO */}
         <PeriodSelector
@@ -315,13 +313,36 @@ Gerado no Patrimo Brasil`;
           onCustomChange={setCustom}
         />
 
+        {/* AÇÕES DE EXPORTAÇÃO */}
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={copyTextSummary}
+            title="Copiar resumo textual"
+          >
+            <Copy className="mr-1.5 h-4 w-4" /> Copiar resumo
+          </Button>
+          <Button size="sm" variant="outline" onClick={exportCSV} title="Baixar planilha CSV">
+            <FileSpreadsheet className="mr-1.5 h-4 w-4" /> Exportar CSV
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => window.print()}
+            title="Imprimir ou salvar em PDF"
+          >
+            <Printer className="mr-1.5 h-4 w-4" /> Imprimir / PDF
+          </Button>
+        </div>
+
         {/* BARRA DE FILTROS DE INVESTIGAÇÃO */}
         <Card className="border-border/80">
           <CardContent className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-1.5">
               <Label className="text-xs">Filtrar por conta</Label>
               <Select value={filterAccount} onValueChange={setFilterAccount}>
-                <SelectTrigger className="h-8 text-xs">
+                <SelectTrigger className="h-9 text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -338,7 +359,7 @@ Gerado no Patrimo Brasil`;
             <div className="space-y-1.5">
               <Label className="text-xs">Filtrar por cartão</Label>
               <Select value={filterCard} onValueChange={setFilterCard}>
-                <SelectTrigger className="h-8 text-xs">
+                <SelectTrigger className="h-9 text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -355,7 +376,7 @@ Gerado no Patrimo Brasil`;
             <div className="space-y-1.5">
               <Label className="text-xs">Filtrar por categoria</Label>
               <Select value={filterCategory} onValueChange={setFilterCategory}>
-                <SelectTrigger className="h-8 text-xs">
+                <SelectTrigger className="h-9 text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -372,7 +393,7 @@ Gerado no Patrimo Brasil`;
             <div className="space-y-1.5">
               <Label className="text-xs">Tipo de movimentação</Label>
               <Select value={filterKind} onValueChange={setFilterKind}>
-                <SelectTrigger className="h-8 text-xs">
+                <SelectTrigger className="h-9 text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -427,7 +448,7 @@ Gerado no Patrimo Brasil`;
         </Card>
 
         {/* 1. COMPARAÇÃO COM O PERÍODO ANTERIOR */}
-        <Card className="bg-gradient-to-br from-card to-accent/20">
+        <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-primary" /> Comparação com o período anterior
@@ -492,8 +513,18 @@ Gerado no Patrimo Brasil`;
                   fontSize={11}
                 />
                 <Tooltip formatter={(value: number) => formatBRL(Number(value))} />
-                <Bar dataKey="receitas" fill="var(--positive)" radius={[4, 4, 0, 0]} name="Entradas" />
-                <Bar dataKey="despesas" fill="var(--destructive)" radius={[4, 4, 0, 0]} name="Saídas" />
+                <Bar
+                  dataKey="receitas"
+                  fill="var(--positive)"
+                  radius={[4, 4, 0, 0]}
+                  name="Entradas"
+                />
+                <Bar
+                  dataKey="despesas"
+                  fill="var(--destructive)"
+                  radius={[4, 4, 0, 0]}
+                  name="Saídas"
+                />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -504,8 +535,8 @@ Gerado no Patrimo Brasil`;
           {/* Gastos por Categoria com Clique Interativo */}
           <Card>
             <CardHeader className="pb-2">
-<CardTitle className="text-base">Gastos por categoria</CardTitle>
-          </CardHeader>
+              <CardTitle className="text-base">Gastos por categoria</CardTitle>
+            </CardHeader>
             <CardContent>
               {byCategory.length === 0 ? (
                 <p className="py-8 text-center text-xs text-muted-foreground">
@@ -653,7 +684,11 @@ Gerado no Patrimo Brasil`;
           <DialogHeader>
             <DialogTitle>Gastos em "{inspectCategory?.name}"</DialogTitle>
             <DialogDescription>
-              {inspectCategory?.items.length} {inspectCategory?.items.length === 1 ? "movimentação encontrada" : "movimentações encontradas"} no período selecionado.
+              {inspectCategory?.items.length}{" "}
+              {inspectCategory?.items.length === 1
+                ? "movimentação encontrada"
+                : "movimentações encontradas"}{" "}
+              no período selecionado.
             </DialogDescription>
           </DialogHeader>
 

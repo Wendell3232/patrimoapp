@@ -449,7 +449,7 @@ function ContasFuturas() {
                 type="button"
                 variant={horizon === tab.id ? "default" : "ghost"}
                 size="sm"
-                className="h-7 shrink-0 whitespace-nowrap rounded-md text-xs font-medium"
+                className="h-9 shrink-0 whitespace-nowrap rounded-md text-xs font-medium"
                 onClick={() => setHorizon(tab.id as Horizon)}
               >
                 {tab.label}
@@ -472,50 +472,37 @@ function ContasFuturas() {
 
         {/* RESUMO SUPERIOR COM SALDO PROJETADO */}
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-xl border border-positive/30 bg-positive/5 p-3 shadow-xs">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Entradas previstas
-            </span>
+          <div className="rounded-xl border border-border bg-card p-3 shadow-xs">
+            <span className="text-xs font-medium text-muted-foreground">Entradas previstas</span>
             <p className="mt-1 text-xl font-bold tabular text-positive">
               + {formatBRL(viewData.totalPredictedIncome)}
             </p>
           </div>
 
-          <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-3 shadow-xs">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Saídas previstas
-            </span>
+          <div className="rounded-xl border border-border bg-card p-3 shadow-xs">
+            <span className="text-xs font-medium text-muted-foreground">Saídas previstas</span>
             <p className="mt-1 text-xl font-bold tabular text-destructive">
               - {formatBRL(viewData.totalPredictedExpense)}
             </p>
           </div>
 
-          <div
-            className={`rounded-xl border p-3 shadow-xs ${
-              viewData.projectedFinalBalance < 0
-                ? "border-destructive/40 bg-destructive/10 text-destructive"
-                : "border-primary/20 bg-card"
-            }`}
-          >
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Saldo projetado final
-            </span>
-            <p className="mt-1 text-xl font-bold tabular text-foreground">
+          <div className="rounded-xl border border-border bg-card p-3 shadow-xs">
+            <span className="text-xs font-medium text-muted-foreground">Saldo projetado final</span>
+            <p
+              className={`mt-1 text-xl font-bold tabular ${
+                viewData.projectedFinalBalance < 0 ? "text-destructive" : "text-foreground"
+              }`}
+            >
               {formatBRL(viewData.projectedFinalBalance)}
-            </p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">
-              Saldo atual ({formatBRL(viewData.currentTotalBalance)}) + entradas - saídas
             </p>
           </div>
 
           <div className="rounded-xl border border-border bg-card p-3 shadow-xs">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Mês com maior volume
-            </span>
+            <span className="text-xs font-medium text-muted-foreground">Mês com maior volume</span>
             <p className="mt-1 text-sm font-bold text-foreground truncate">
               {viewData.maxExpenseMonth.label || "Nenhum no período"}
             </p>
-            <p className="text-[11px] text-destructive font-medium mt-0.5">
+            <p className="mt-0.5 text-xs font-medium text-destructive tabular">
               {viewData.maxExpenseMonth.amount > 0
                 ? formatBRL(viewData.maxExpenseMonth.amount)
                 : "R$ 0,00"}
@@ -614,18 +601,12 @@ function ContasFuturas() {
                               </div>
 
                               <div className="min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-semibold text-sm text-foreground truncate">
-                                    {item.description}
-                                  </span>
-                                  {isCard && (
-                                    <Badge variant="outline" className="text-[10px]">
-                                      Fatura {card?.name}
-                                    </Badge>
-                                  )}
-                                </div>
+                                <span className="font-semibold text-sm text-foreground truncate">
+                                  {item.description}
+                                </span>
                                 <p className="text-xs text-muted-foreground mt-0.5">
                                   Vence em: {formatDate(item.due_date)}
+                                  {card ? ` • ${card.name}` : ""}
                                   {category ? ` • ${category.name}` : ""}
                                 </p>
                               </div>
@@ -644,7 +625,7 @@ function ContasFuturas() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-8 shrink-0 text-xs font-medium"
+                                className="h-9 shrink-0 text-xs font-medium"
                                 onClick={() => startSettling(item)}
                               >
                                 Confirmar pagamento

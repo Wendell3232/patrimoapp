@@ -75,10 +75,10 @@ const NAV_GROUPS = [
 
 const MOBILE_NAV = [
   { to: "/dashboard", label: "Início", icon: LayoutDashboard },
-  { to: "/movimentacoes", label: "Movimentações", icon: ArrowLeftRight },
+  { to: "/movimentacoes", label: "Lançamentos", icon: ArrowLeftRight },
   { to: "/cartoes", label: "Cartões", icon: CreditCard },
   { to: "/orcamentos", label: "Orçamentos", icon: PiggyBank },
-  { to: "/compromissos", label: "Contas futuras", icon: CalendarClock },
+  { to: "/compromissos", label: "Futuras", icon: CalendarClock },
 ] as const;
 
 export function AppShell({
@@ -241,7 +241,7 @@ export function AppShell({
 
       <div className="flex min-h-screen min-w-0 flex-col">
         <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/85">
-          <div className="flex min-h-[72px] flex-wrap items-center gap-2 px-4 py-2.5 sm:px-6 lg:px-8">
+          <div className="flex min-h-[56px] flex-wrap items-center gap-1.5 px-3 py-2 sm:min-h-[72px] sm:gap-2 sm:px-6 lg:px-8">
             <Button
               type="button"
               variant="outline"
@@ -267,9 +267,9 @@ export function AppShell({
               )}
             </Button>
             <div className="min-w-0 flex-1">
-              <h1 className="truncate text-lg font-semibold sm:text-xl">{title}</h1>
+              <h1 className="truncate text-base font-semibold sm:text-xl">{title}</h1>
               {description && (
-                <p className="truncate text-[13px] text-muted-foreground">{description}</p>
+                <p className="truncate text-xs text-muted-foreground">{description}</p>
               )}
             </div>
             <div className="flex items-center gap-2">{actions}</div>

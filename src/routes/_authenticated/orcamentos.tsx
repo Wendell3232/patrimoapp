@@ -8,11 +8,8 @@ import {
   ChevronRight,
   Copy,
   Info,
-  Pencil,
-  PiggyBank,
+  MoreVertical,
   Plus,
-  Trash2,
-  TrendingUp,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -40,6 +37,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -52,12 +56,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useFinance, useRefreshFinance } from "@/lib/data";
-import {
-  budgetStatus,
-  predictBudgetPacing,
-  type Budget,
-  type Category,
-} from "@/lib/finance";
+import { budgetStatus, predictBudgetPacing, type Budget, type Category } from "@/lib/finance";
 import { formatBRL, formatMonthLabel, monthKeyToday, parseISODate, toISODate } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/orcamentos")({
@@ -119,7 +118,9 @@ function Orcamentos() {
       limit_amount: limit,
     });
     if (insertError) {
-      setError("Não foi possível salvar. Talvez já exista um orçamento para essa categoria neste mês.");
+      setError(
+        "Não foi possível salvar. Talvez já exista um orçamento para essa categoria neste mês.",
+      );
       return;
     }
     await refresh();
@@ -167,7 +168,9 @@ function Orcamentos() {
     const previous = shiftMonth(month, -1);
     const source = data.budgets.filter((b) => b.month.startsWith(previous));
     if (source.length === 0) {
-      toast.info(`Nenhum orçamento encontrado em ${formatMonthLabel(parseISODate(`${previous}-01`))}.`);
+      toast.info(
+        `Nenhum orçamento encontrado em ${formatMonthLabel(parseISODate(`${previous}-01`))}.`,
+      );
       setCopyConfirmOpen(false);
       return;
     }
@@ -198,7 +201,9 @@ function Orcamentos() {
     }
 
     await refresh();
-    toast.success(`${toInsert.length} orçamentos copiados para ${formatMonthLabel(parseISODate(`${month}-01`))}.`);
+    toast.success(
+      `${toInsert.length} orçamentos copiados para ${formatMonthLabel(parseISODate(`${month}-01`))}.`,
+    );
     setCopyConfirmOpen(false);
   }
 
@@ -221,7 +226,9 @@ function Orcamentos() {
 
   // Identificar gastos sem orçamento neste mês
   const startISO = `${month}-01`;
-  const endISO = toISODate(new Date(parseISODate(startISO).getFullYear(), parseISODate(startISO).getMonth() + 1, 0));
+  const endISO = toISODate(
+    new Date(parseISODate(startISO).getFullYear(), parseISODate(startISO).getMonth() + 1, 0),
+  );
   const budgetedCategoryIds = new Set(statuses.map((s) => s.budget.category_id));
 
   const expensesWithoutBudget = data.categories
@@ -246,90 +253,15 @@ function Orcamentos() {
   const currentMonthLabel = formatMonthLabel(parseISODate(`${month}-01`));
 
   return (
-    <AppShell
-      title="Orçamentos"
-      actions={
-        <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setCopyConfirmOpen(true)}
-            title="Copiar limites do mês anterior"
-          >
-            <Copy className="mr-1.5 h-4 w-4" /> Repetir mês anterior
-          </Button>
-
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm">
-                <Plus className="mr-1.5 h-4 w-4" /> Definir orçamento
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Definir orçamento para {currentMonthLabel}</DialogTitle>
-                <DialogDescription>
-                  Estabeleça o teto que deseja gastar nesta categoria ao longo do mês.
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="space-y-4 py-2">
-                <div className="space-y-1.5">
-                  <Label>Categoria</Label>
-                  <Select value={categoryId} onValueChange={setCategoryId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione a categoria" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {data.categories
-                        .filter((c) => c.kind === "despesa")
-                        .map((c) => (
-                          <SelectItem key={c.id} value={c.id}>
-                            {c.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="limit-amount">Limite mensal (R$)</Label>
-                  <CurrencyInput
-                    id="limit-amount"
-                    value={limit}
-                    onValueChange={setLimit}
-                    placeholder="0,00"
-                  />
-                </div>
-
-                {error && (
-                  <p className="rounded-md bg-destructive/10 p-2 text-xs text-destructive">
-                    {error}
-                  </p>
-                )}
-              </div>
-
-              <DialogFooter className="gap-2 sm:gap-0">
-                <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button type="button" onClick={() => void create()}>
-                  Salvar orçamento
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-      }
-    >
+    <AppShell title="Orçamentos">
       <div className="space-y-6">
-        {/* NAVEGAÇÃO DE MÊS */}
-        <div className="flex items-center justify-between">
+        {/* NAVEGAÇÃO DE MÊS E AÇÕES */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="icon"
-              className="h-8 w-8"
+              className="h-9 w-9"
               onClick={() => setMonth((m) => shiftMonth(m, -1))}
               aria-label="Mês anterior"
             >
@@ -341,57 +273,119 @@ function Orcamentos() {
             <Button
               variant="outline"
               size="icon"
-              className="h-8 w-8"
+              className="h-9 w-9"
               onClick={() => setMonth((m) => shiftMonth(m, 1))}
               aria-label="Próximo mês"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setCopyConfirmOpen(true)}
+              title="Copiar limites do mês anterior"
+            >
+              <Copy className="mr-1.5 h-4 w-4" /> Repetir mês anterior
+            </Button>
+
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm">
+                  <Plus className="mr-1.5 h-4 w-4" /> Definir orçamento
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Definir orçamento para {currentMonthLabel}</DialogTitle>
+                  <DialogDescription>
+                    Estabeleça o teto que deseja gastar nesta categoria ao longo do mês.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-4 py-2">
+                  <div className="space-y-1.5">
+                    <Label>Categoria</Label>
+                    <Select value={categoryId} onValueChange={setCategoryId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione a categoria" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {data.categories
+                          .filter((c) => c.kind === "despesa")
+                          .map((c) => (
+                            <SelectItem key={c.id} value={c.id}>
+                              {c.name}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="limit-amount">Limite mensal (R$)</Label>
+                    <CurrencyInput
+                      id="limit-amount"
+                      value={limit}
+                      onValueChange={setLimit}
+                      placeholder="0,00"
+                    />
+                  </div>
+
+                  {error && (
+                    <p className="rounded-md bg-destructive/10 p-2 text-xs text-destructive">
+                      {error}
+                    </p>
+                  )}
+                </div>
+
+                <DialogFooter className="gap-2 sm:gap-0">
+                  <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                    Cancelar
+                  </Button>
+                  <Button type="button" onClick={() => void create()}>
+                    Salvar orçamento
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         {/* RESUMO MENSAL NO TOPO */}
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <div className="rounded-xl border border-border bg-card p-3 shadow-xs">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Total planejado
-            </span>
+            <span className="text-xs font-medium text-muted-foreground">Total planejado</span>
             <p className="mt-1 text-xl font-bold tabular text-foreground">
               {formatBRL(totalPlanned)}
             </p>
           </div>
 
           <div className="rounded-xl border border-border bg-card p-3 shadow-xs">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Total gasto
-            </span>
+            <span className="text-xs font-medium text-muted-foreground">Total gasto</span>
             <p className="mt-1 text-xl font-bold tabular text-foreground">
               {formatBRL(totalSpent)}
             </p>
           </div>
 
-          <div className="rounded-xl border border-positive/30 bg-positive/5 p-3 shadow-xs">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Ainda disponível
-            </span>
+          <div className="rounded-xl border border-border bg-card p-3 shadow-xs">
+            <span className="text-xs font-medium text-muted-foreground">Ainda disponível</span>
             <p className="mt-1 text-xl font-bold tabular text-positive">
               {formatBRL(totalAvailable)}
             </p>
           </div>
 
-          <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 shadow-xs">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Em atenção
-            </span>
+          <div className="rounded-xl border border-border bg-card p-3 shadow-xs">
+            <span className="text-xs font-medium text-muted-foreground">Em atenção</span>
             <p className="mt-1 text-xl font-bold tabular text-amber-600 dark:text-amber-400">
               {warningCount} {warningCount === 1 ? "categoria" : "categorias"}
             </p>
           </div>
 
-          <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-3 shadow-xs">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Ultrapassaram
-            </span>
+          <div className="rounded-xl border border-border bg-card p-3 shadow-xs">
+            <span className="text-xs font-medium text-muted-foreground">Ultrapassaram</span>
             <p className="mt-1 text-xl font-bold tabular text-destructive">
               {exceededCount} {exceededCount === 1 ? "categoria" : "categorias"}
             </p>
@@ -402,7 +396,8 @@ function Orcamentos() {
         {statuses.length === 0 ? (
           <Card>
             <CardContent className="p-12 text-center text-sm text-muted-foreground">
-              Nenhum orçamento configurado para {currentMonthLabel}. Clique em "Definir orçamento" ou "Repetir mês anterior" para organizar seus limites.
+              Nenhum orçamento configurado para {currentMonthLabel}. Clique em "Definir orçamento"
+              ou "Repetir mês anterior" para organizar seus limites.
             </CardContent>
           </Card>
         ) : (
@@ -437,13 +432,17 @@ function Orcamentos() {
                 stateBadge = {
                   label: "Atenção",
                   variant: "outline" as const,
-                  className: "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400",
+                  className:
+                    "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400",
                   icon: AlertCircle,
                 };
               }
 
               return (
-                <Card key={budget.id} className="flex flex-col justify-between transition-shadow hover:shadow-md">
+                <Card
+                  key={budget.id}
+                  className="flex flex-col justify-between transition-shadow hover:shadow-md"
+                >
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between gap-2">
                       <div>
@@ -451,7 +450,10 @@ function Orcamentos() {
                           <CardTitle className="text-base font-bold">
                             {category?.name ?? "Categoria"}
                           </CardTitle>
-                          <Badge variant={stateBadge.variant} className={`text-xs gap-1 ${stateBadge.className}`}>
+                          <Badge
+                            variant={stateBadge.variant}
+                            className={`text-xs gap-1 ${stateBadge.className}`}
+                          >
                             <stateBadge.icon className="h-3 w-3" />
                             {stateBadge.label}
                           </Badge>
@@ -461,32 +463,38 @@ function Orcamentos() {
                         </CardDescription>
                       </div>
 
-                      <div className="flex items-center gap-1">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                          title="Editar limite"
-                          onClick={() => {
-                            setEditing(budget);
-                            setEditLimit(Number(budget.limit_amount));
-                            setEditError(null);
-                          }}
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                          title="Excluir orçamento"
-                          onClick={() => setRemoving(budget)}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 text-muted-foreground hover:text-foreground"
+                            title="Ações do orçamento"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-44">
+                          <DropdownMenuItem
+                            className="cursor-pointer font-medium"
+                            onClick={() => {
+                              setEditing(budget);
+                              setEditLimit(Number(budget.limit_amount));
+                              setEditError(null);
+                            }}
+                          >
+                            Editar limite
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="cursor-pointer text-destructive focus:text-destructive"
+                            onClick={() => setRemoving(budget)}
+                          >
+                            Excluir orçamento
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </CardHeader>
 
@@ -495,10 +503,17 @@ function Orcamentos() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-muted-foreground">
-                          Já gasto: <strong className="text-foreground tabular">{formatBRL(spent)}</strong> ({usage.toFixed(0)}%)
+                          Já gasto:{" "}
+                          <strong className="text-foreground tabular">{formatBRL(spent)}</strong> (
+                          {usage.toFixed(0)}%)
                         </span>
                         <span className="text-muted-foreground">
-                          Resta: <strong className={remaining === 0 ? "text-destructive" : "text-positive"}>{formatBRL(remaining)}</strong>
+                          Resta:{" "}
+                          <strong
+                            className={remaining === 0 ? "text-destructive" : "text-positive"}
+                          >
+                            {formatBRL(remaining)}
+                          </strong>
                         </span>
                       </div>
 
@@ -514,17 +529,18 @@ function Orcamentos() {
                       />
                     </div>
 
-                    {/* Previsão no ritmo atual */}
-                    <div className="rounded-lg bg-accent/30 p-2.5 text-xs text-muted-foreground">
+                    <div className="rounded-lg p-2.5 text-xs text-muted-foreground">
                       {spent === 0 ? (
                         <span>Nenhum gasto nesta categoria até o momento no mês.</span>
                       ) : pacing.willExceed ? (
-                        <span className="text-amber-700 dark:text-amber-400 font-medium">
-                          Nesse ritmo, você pode passar {formatBRL(pacing.projectedExcess)} do limite até o fim do mês (previsão total de {formatBRL(pacing.projectedTotal)}).
+                        <span className="font-medium text-amber-700 dark:text-amber-400">
+                          Nesse ritmo, você pode passar {formatBRL(pacing.projectedExcess)} do
+                          limite até o fim do mês.
                         </span>
                       ) : (
                         <span>
-                          No ritmo atual, a estimativa até o fim do mês é de {formatBRL(pacing.projectedTotal)}, dentro do limite.
+                          No ritmo atual, a estimativa até o fim do mês é de{" "}
+                          {formatBRL(pacing.projectedTotal)}.
                         </span>
                       )}
                     </div>
@@ -556,12 +572,14 @@ function Orcamentos() {
                   >
                     <div>
                       <span className="font-semibold text-foreground">{category.name}</span>
-                      <p className="text-muted-foreground">Total gasto neste mês: {formatBRL(spent)}</p>
+                      <p className="text-muted-foreground">
+                        Total gasto neste mês: {formatBRL(spent)}
+                      </p>
                     </div>
                     <Button
                       size="sm"
                       variant="outline"
-                      className="text-xs h-7"
+                      className="text-xs h-9"
                       onClick={() => {
                         setCategoryId(category.id);
                         setLimit(Math.ceil(spent * 1.15)); // Sugestão 15% acima do atual
@@ -587,15 +605,19 @@ function Orcamentos() {
             </AlertDialogTitle>
             <AlertDialogDescription className="text-left space-y-2">
               <p>
-                Vamos copiar os limites configurados em <strong>{prevMonthLabel}</strong> para <strong>{currentMonthLabel}</strong>.
+                Vamos copiar os limites configurados em <strong>{prevMonthLabel}</strong> para{" "}
+                <strong>{currentMonthLabel}</strong>.
               </p>
               <p>
-                Você poderá editar ou remover qualquer valor individualmente depois que forem copiados.
+                Você poderá editar ou remover qualquer valor individualmente depois que forem
+                copiados.
               </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setCopyConfirmOpen(false)}>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setCopyConfirmOpen(false)}>
+              Cancelar
+            </AlertDialogCancel>
             <AlertDialogAction onClick={() => void copyPreviousMonth()}>
               Confirmar e copiar
             </AlertDialogAction>
@@ -647,14 +669,13 @@ function Orcamentos() {
           <AlertDialogHeader>
             <AlertDialogTitle>Remover orçamento?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta categoria deixará de ter um teto de gastos para o mês selecionado. Nenhum lançamento ou dado financeiro será apagado.
+              Esta categoria deixará de ter um teto de gastos para o mês selecionado. Nenhum
+              lançamento ou dado financeiro será apagado.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setRemoving(null)}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => void remove()}>
-              Remover orçamento
-            </AlertDialogAction>
+            <AlertDialogAction onClick={() => void remove()}>Remover orçamento</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

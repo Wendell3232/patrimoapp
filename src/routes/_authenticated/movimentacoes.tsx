@@ -184,8 +184,13 @@ function Movimentacoes() {
       // Filtros rápidos específicos
       if (quickFilter === "sem_categoria" && tx.category_id !== null) return false;
       if (quickFilter === "cartao" && !tx.credit_card_id) return false;
-      if (quickFilter === "futuras" && tx.paid && tx.occurred_on <= toISODate(new Date())) return false;
-      if (quickFilter === "recorrentes" && !tx.installment_group && !tx.notes?.includes("recorrente"))
+      if (quickFilter === "futuras" && tx.paid && tx.occurred_on <= toISODate(new Date()))
+        return false;
+      if (
+        quickFilter === "recorrentes" &&
+        !tx.installment_group &&
+        !tx.notes?.includes("recorrente")
+      )
         return false;
 
       // Filtros gerais
@@ -283,10 +288,7 @@ function Movimentacoes() {
 
   // Ação: Marcar como pago
   async function markAsPaid(tx: Transaction) {
-    const { error } = await supabase
-      .from("transactions")
-      .update({ paid: true })
-      .eq("id", tx.id);
+    const { error } = await supabase.from("transactions").update({ paid: true }).eq("id", tx.id);
 
     if (error) {
       toast.error("Não foi possível atualizar o status.");
@@ -391,7 +393,9 @@ function Movimentacoes() {
         <Card>
           <CardContent className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-5">
             <div className="space-y-1.5 sm:col-span-2 lg:col-span-2">
-              <Label htmlFor="busca" className="text-xs">Buscar descrição</Label>
+              <Label htmlFor="busca" className="text-xs">
+                Buscar descrição
+              </Label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -458,12 +462,15 @@ function Movimentacoes() {
         {/* RESUMO DOS FILTROS APLICADOS */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-1 text-sm">
           <div className="text-muted-foreground text-xs">
-            Exibindo <strong>{rows.length}</strong> {rows.length === 1 ? "movimentação" : "movimentações"}
+            Exibindo <strong>{rows.length}</strong>{" "}
+            {rows.length === 1 ? "movimentação" : "movimentações"}
           </div>
           <div className="flex items-center gap-4 text-xs font-medium">
             <span className="text-positive">Entradas: {formatBRL(total.income)}</span>
             <span className="text-destructive">Saídas: {formatBRL(total.expense)}</span>
-            <span className={total.income - total.expense >= 0 ? "text-positive" : "text-destructive"}>
+            <span
+              className={total.income - total.expense >= 0 ? "text-positive" : "text-destructive"}
+            >
               Sobrou: {formatBRL(total.income - total.expense)}
             </span>
           </div>
@@ -526,7 +533,10 @@ function Movimentacoes() {
                               </Badge>
                             )}
                             {isFuture && (
-                              <Badge variant="outline" className="text-[10px] border-amber-500/40 text-amber-600 bg-amber-500/10">
+                              <Badge
+                                variant="outline"
+                                className="text-[10px] border-amber-500/40 text-amber-600 bg-amber-500/10"
+                              >
                                 <Clock className="mr-1 h-2.5 w-2.5" /> Previsto
                               </Badge>
                             )}
@@ -537,7 +547,7 @@ function Movimentacoes() {
                             <span>•</span>
                             <span>{category?.name ?? "Sem categoria"}</span>
                             <span>•</span>
-                            <span>{card ? card.name : account?.name ?? "Conta principal"}</span>
+                            <span>{card ? card.name : (account?.name ?? "Conta principal")}</span>
                           </div>
                         </div>
                       </div>
@@ -564,29 +574,41 @@ function Movimentacoes() {
                               type="button"
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                              className="h-9 w-9 text-muted-foreground hover:text-foreground"
                               title="Ações da movimentação"
                             >
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem onClick={() => openEdit(tx)} className="cursor-pointer font-medium">
+                            <DropdownMenuItem
+                              onClick={() => openEdit(tx)}
+                              className="cursor-pointer font-medium"
+                            >
                               <Edit2 className="mr-2 h-4 w-4" /> Editar
                             </DropdownMenuItem>
 
-                            <DropdownMenuItem onClick={() => duplicate(tx)} className="cursor-pointer">
+                            <DropdownMenuItem
+                              onClick={() => duplicate(tx)}
+                              className="cursor-pointer"
+                            >
                               <Copy className="mr-2 h-4 w-4" /> Duplicar
                             </DropdownMenuItem>
 
                             {isFuture && (
-                              <DropdownMenuItem onClick={() => markAsPaid(tx)} className="cursor-pointer text-positive">
+                              <DropdownMenuItem
+                                onClick={() => markAsPaid(tx)}
+                                className="cursor-pointer text-positive"
+                              >
                                 <CheckCircle2 className="mr-2 h-4 w-4" /> Marcar como pago
                               </DropdownMenuItem>
                             )}
 
                             {tx.installment_group && (
-                              <DropdownMenuItem onClick={() => setViewingInstallments(tx)} className="cursor-pointer">
+                              <DropdownMenuItem
+                                onClick={() => setViewingInstallments(tx)}
+                                className="cursor-pointer"
+                              >
                                 <Repeat className="mr-2 h-4 w-4" /> Ver parcelas
                               </DropdownMenuItem>
                             )}
@@ -620,7 +642,8 @@ function Movimentacoes() {
           <DialogHeader>
             <DialogTitle>Editar movimentação</DialogTitle>
             <DialogDescription>
-              Ajuste os dados da movimentação com segurança. O saldo será atualizado automaticamente.
+              Ajuste os dados da movimentação com segurança. O saldo será atualizado
+              automaticamente.
             </DialogDescription>
           </DialogHeader>
 
@@ -738,15 +761,18 @@ function Movimentacoes() {
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-3 text-left">
               <p>
-                Ela deixará de aparecer no seu saldo, nos relatórios e nos orçamentos. Esta ação não pode ser desfeita.
+                Ela deixará de aparecer no seu saldo, nos relatórios e nos orçamentos. Esta ação não
+                pode ser desfeita.
               </p>
               {deleting?.installment_group && (
                 <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-foreground">
                   <p className="font-semibold text-amber-700 dark:text-amber-400">
-                    Atenção: Esta compra é parcelada ({deleting.installment_number}/{deleting.installment_total}).
+                    Atenção: Esta compra é parcelada ({deleting.installment_number}/
+                    {deleting.installment_total}).
                   </p>
                   <p className="mt-1">
-                    Você pode optar por excluir somente esta parcela ou todas as parcelas deste grupo.
+                    Você pode optar por excluir somente esta parcela ou todas as parcelas deste
+                    grupo.
                   </p>
                   <div className="mt-2 flex gap-2">
                     <Button
@@ -813,9 +839,7 @@ function Movimentacoes() {
                   <p className="text-muted-foreground">{formatDate(inst.occurred_on)}</p>
                 </div>
                 <div className="text-right">
-                  <span className="font-bold text-destructive">
-                    {formatBRL(inst.amount)}
-                  </span>
+                  <span className="font-bold text-destructive">{formatBRL(inst.amount)}</span>
                   <p className="text-[10px] text-muted-foreground">
                     {inst.paid ? "Paga" : "Prevista"}
                   </p>
