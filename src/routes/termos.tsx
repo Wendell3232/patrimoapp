@@ -77,7 +77,7 @@ function Termos() {
         <ul>
           <li>A licença dá acesso a todos os recursos do serviço enquanto ele existir, incluindo atualizações futuras.</li>
           <li>A licença é pessoal, não transferível e não compartilhável entre várias pessoas.</li>
-          <li>Ao excluir sua conta, o acesso ao serviço com aquela licença é encerrado; o código de licença não pode ser transferido para outra conta.</li>
+          <li>Ao excluir sua conta, o acesso ao serviço com aquela licença é encerrado; a licença fica vinculada ao e-mail da compra e não pode ser transferida para outra conta.</li>
           <li>Podemos suspender o acesso por violação destes Termos, sem direito a reembolso nesse caso.</li>
         </ul>
       </section>
@@ -85,9 +85,8 @@ function Termos() {
       <section className="space-y-3">
         <h2>5. Ativação</h2>
         <p>
-          Após a confirmação do pagamento, você recebe um <strong>código de licença</strong> para
-          ativar o acesso na tela de ativação do app. O código é confidencial e intransferível; não
-          o compartilhe em redes sociais, fóruns ou com terceiros.
+          Após a confirmação do pagamento, seu acesso é liberado automaticamente na conta que usar o{" "}
+          <strong>mesmo e-mail da compra</strong> — sem código para ativar.
         </p>
       </section>
 
