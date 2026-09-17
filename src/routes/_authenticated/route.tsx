@@ -26,7 +26,7 @@ export const Route = createFileRoute("/_authenticated")({
       const ownerEmail = LICENSE_OWNER_EMAILS.some(
         (email) => email.toLowerCase() === (user.email ?? "").toLowerCase(),
       );
-      const licensed = ownerEmail || (await hasActiveLicense(user.id));
+      const licensed = ownerEmail || (await hasActiveLicense());
       if (!licensed) {
         throw redirect({ to: "/ativar" });
       }

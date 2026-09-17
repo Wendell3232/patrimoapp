@@ -7,11 +7,7 @@ const WIVEN_SECRET = Deno.env.get("WIVEN_WEBHOOK_SECRET");
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const FROM_EMAIL = Deno.env.get("FROM_EMAIL") ?? "Patrimo <onboarding@resend.dev>";
 
-const SIGNATURE_HEADERS = [
-  "x-wiven-signature",
-  "x-signature",
-  "x-webhook-signature",
-];
+const SIGNATURE_HEADERS = ["x-wiven-signature", "x-signature", "x-webhook-signature"];
 
 if (!SERVICE_ROLE_KEY || !SUPABASE_URL) {
   throw new Error("Faltam SERVICE_ROLE_KEY ou SUPABASE_URL");
@@ -106,48 +102,68 @@ function extractPaymentId(body: Record<string, unknown>): string | null {
 
 function looksLikePaidEvent(body: Record<string, unknown>): boolean {
   const event = findString(body, ["event", "data.event", "type"]) ?? "";
-  const status = findString(body, ["status", "data.status", "charge.status", "payment.status"]) ?? "";
+  const status =
+    findString(body, ["status", "data.status", "charge.status", "payment.status"]) ?? "";
   const s = `${event} ${status}`.toLowerCase();
   if (!s.trim()) return true;
   if (/(paid|approved|completed|confirmed|success|aprov|pago|completa|conclu)/.test(s)) return true;
-  if (/(pending|failed|refund|cancel|reject|expired|estorn|fraud|chargeback|waiting|pendente|agnar)/.test(s)) return false;
+  if (
+    /(pending|failed|refund|cancel|reject|expired|estorn|fraud|chargeback|waiting|pendente|agnar)/.test(
+      s,
+    )
+  )
+    return false;
   return true;
 }
 
-function generateCode(): string {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  const group = () =>
-    Array.from(crypto.getRandomValues(new Uint8Array(4)))
-      .map((b) => chars[b % chars.length])
-      .join("");
-  return `${group()}-${group()}-${group()}`;
+async function findUserByEmail(email: string): Promise<{ id: string; email: string } | null> {
+  try {
+    for (let page = 1; page <= 20; page++) {
+      const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 1000 });
+      if (error) {
+        console.error("Erro ao listar usuários:", error.message);
+        return null;
+      }
+      const users = data?.users ?? [];
+      if (users.length === 0) return null;
+      const hit = users.find((u) => u.email?.toLowerCase() === email);
+      if (hit) return { id: hit.id, email: hit.email ?? email };
+    }
+  } catch (err) {
+    console.error("Falha ao buscar usuário por e-mail:", err instanceof Error ? err.message : err);
+  }
+  return null;
 }
 
-async function sendEmail(to: string, code: string): Promise<void> {
+async function sendEmail(to: string): Promise<void> {
   if (!RESEND_API_KEY) {
-    console.warn("RESEND_API_KEY não configurada — código não enviado por e-mail.", { to, code });
+    console.warn("RESEND_API_KEY não configurada — e-mail de confirmação não enviado.", { to });
     return;
   }
   const html = `
     <div style="font-family:Inter,ui-sans-serif,system-ui,sans-serif;max-width:520px;margin:0 auto;color:#17212b">
-      <h2 style="margin:0 0 8px">Seu acesso ao Patrimo chegou</h2>
-      <p style="margin:0 0 16px;color:#66717d">Pagamento confirmado. Use o código abaixo para ativar sua licença:</p>
-      <div style="font-size:26px;font-weight:700;letter-spacing:3px;background:#f0faf5;border:1px solid #cfe7dc;border-radius:10px;padding:16px;text-align:center;margin:0 0 16px">${code}</div>
-      <p style="margin:0 0 8px;color:#17212b"><strong>Como ativar:</strong></p>
+      <h2 style="margin:0 0 8px">Seu acesso ao Patrimo foi liberado</h2>
+      <p style="margin:0 0 16px;color:#66717d">Pagamento confirmado. Sua licença já está vinculada ao e-mail <strong>${to}</strong>.</p>
       <ol style="margin:0 0 16px;padding-left:20px;color:#66717d;line-height:1.6">
-        <li>Crie sua conta em <a href="https://patrimofinance.vercel.app/auth">patrimofinance.vercel.app/auth</a></li>
-        <li>Entre com a sua conta</li>
-        <li>Cole o código acima na tela de ativação</li>
+        <li>Entre em <a href="https://patrimofinance.vercel.app/auth">patrimofinance.vercel.app/auth</a></li>
+        <li>Crie ou acesse sua conta com este mesmo e-mail</li>
+        <li>O acesso é liberado automaticamente — sem código</li>
       </ol>
       <p style="margin:0;color:#66717d;font-size:13px">Você tem 7 dias de garantia. Dúvidas: suportepatrimo@gmail.com</p>
     </div>
   `;
-  const text = `Seu acesso ao Patrimo chegou!\n\nCode de licença: ${code}\n\nComo ativar:\n1. Crie sua conta em https://patrimofinance.vercel.app/auth\n2. Entre com a sua conta\n3. Cole o código na tela de ativação\n\nVocê tem 7 dias de garantia. Dúvidas: suportepatrimo@gmail.com`;
+  const text = `Seu acesso ao Patrimo foi liberado!\n\nSua licença já está vinculada ao e-mail ${to}.\n\nComo acessar:\n1. Entre em https://patrimofinance.vercel.app/auth\n2. Crie ou acesse sua conta com este mesmo e-mail\n3. O acesso é liberado automaticamente — sem código\n\nVocê tem 7 dias de garantia. Dúvidas: suportepatrimo@gmail.com`;
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: FROM_EMAIL, to: [to], subject: "Seu acesso ao Patrimo chegou", html, text }),
+    body: JSON.stringify({
+      from: FROM_EMAIL,
+      to: [to],
+      subject: "Seu acesso ao Patrimo foi liberado",
+      html,
+      text,
+    }),
   });
   if (!res.ok) {
     const detail = await res.text();
@@ -194,10 +210,13 @@ Deno.serve(async (req) => {
   const paymentId = extractPaymentId(body);
 
   if (!email) {
-    return new Response(JSON.stringify({ error: "Campo de e-mail do comprador não encontrado no payload." }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: "Campo de e-mail do comprador não encontrado no payload." }),
+      {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
   }
 
   if (paymentId) {
@@ -214,12 +233,13 @@ Deno.serve(async (req) => {
     }
   }
 
-  const code = generateCode();
+  const user = await findUserByEmail(email);
 
   const { error: insertError } = await supabase.from("licenses").insert({
-    code,
     email,
     payment_id: paymentId ?? null,
+    used_by: user?.id ?? null,
+    redeemed_at: user?.id ? new Date().toISOString() : null,
   });
 
   if (insertError) {
@@ -236,13 +256,19 @@ Deno.serve(async (req) => {
   }
 
   try {
-    await sendEmail(email, code);
+    await sendEmail(email);
   } catch (err) {
-    console.error("Falha ao enviar e-mail do código:", err instanceof Error ? err.message : err);
+    console.error(
+      "Falha ao enviar e-mail de confirmação:",
+      err instanceof Error ? err.message : err,
+    );
   }
 
-  return new Response(JSON.stringify({ received: true, processed: true, email, codePresent: true }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
+  return new Response(
+    JSON.stringify({ received: true, processed: true, email, linked: Boolean(user?.id) }),
+    {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    },
+  );
 });

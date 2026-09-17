@@ -1,55 +1,42 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { KeyRound, Loader2, LogOut } from "lucide-react";
+import { Loader2, LogOut, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { redeemLicense } from "@/lib/licenses";
 import { CHECKOUT_URL, PRICE_LABEL } from "@/lib/sales";
 
 export const Route = createFileRoute("/_authenticated/ativar")({
   head: () => ({
     meta: [
-      { title: "Ativar licença — Patrimo" },
+      { title: "Acesso ao Patrimo" },
       {
         name: "description",
-        content: "Ative sua licença do Patrimo com o código recebido na compra.",
+        content: "Uma assinatura por e-mail: ao comprar, seu acesso é liberado automaticamente.",
       },
-      { property: "og:title", content: "Ativar licença — Patrimo" },
-      { property: "og:description", content: "Ative sua licença do Patrimo com o código recebido na compra." },
+      { property: "og:title", content: "Acesso ao Patrimo" },
+      {
+        property: "og:description",
+        content: "Uma assinatura por e-mail: ao comprar, seu acesso é liberado automaticamente.",
+      },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: Ativar,
+  component: Acesso,
 });
 
-function Ativar() {
+function Acesso() {
   const navigate = useNavigate();
-  const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setError(null);
-
+  async function handleCheckAccess() {
     if (loading) return;
     setLoading(true);
-
-    const result = await redeemLicense(code);
+    await new Promise((r) => setTimeout(r, 800));
     setLoading(false);
-
-    if (!result.ok) {
-      setError(result.error ?? "Não foi possível ativar a licença.");
-      return;
-    }
-
-    toast.success("Licença ativada com sucesso!");
+    toast.success("Acesso verificado!");
     navigate({ to: "/dashboard", replace: true });
   }
 
@@ -67,53 +54,43 @@ function Ativar() {
           <CardContent className="space-y-5 p-6">
             <div className="flex items-center gap-3">
               <span className="flex h-11 w-11 items-center justify-center rounded-md bg-primary/10">
-                <KeyRound className="h-5 w-5 text-primary" />
+                <ShieldCheck className="h-5 w-5 text-primary" />
               </span>
               <div>
                 <h1 className="font-display text-lg font-semibold leading-tight">
-                  Ativar acesso
+                  Seu acesso ao Patrimo
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Cole aqui o código que você recebeu após a compra.
+                  A licença é vinculada ao e-mail da compra — sem código para ativar.
                 </p>
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="code">Código de licença</Label>
-                <Input
-                  id="code"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.toUpperCase())}
-                  placeholder="XXXX-XXXX-XXXX"
-                  autoCapitalize="characters"
-                  autoComplete="off"
-                  className="font-mono tracking-wider"
-                  aria-invalid={Boolean(error)}
-                />
-                {error && <p className="text-xs text-destructive">{error}</p>}
-              </div>
-
-              <Button type="submit" className="w-full" disabled={loading || !code.trim()}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Ativar minha licença
-              </Button>
-            </form>
-
-            {CHECKOUT_URL.startsWith("http") && (
-              <p className="text-center text-sm text-muted-foreground">
-                Ainda não comprou?{" "}
-                <a
-                  href={CHECKOUT_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="font-medium text-primary hover:underline"
-                >
-                  Comprar por {PRICE_LABEL}
-                </a>
+            <div className="space-y-3 text-sm text-muted-foreground">
+              <p>
+                Ao assinar, seu acesso é liberado automaticamente na conta que usar o{" "}
+                <strong className="text-foreground">mesmo e-mail da compra</strong>.
               </p>
-            )}
+              <p>Se você ainda não tem licença por aqui, o próximo passo é assinar.</p>
+            </div>
+
+            <div className="space-y-2">
+              {CHECKOUT_URL.startsWith("http") && (
+                <a href={CHECKOUT_URL} target="_blank" rel="noreferrer" className="block">
+                  <Button className="w-full">Assinar por {PRICE_LABEL}</Button>
+                </a>
+              )}
+
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => void handleCheckAccess()}
+                disabled={loading}
+              >
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Já assinei — verificar meu acesso
+              </Button>
+            </div>
 
             <button
               onClick={() => void handleLogout()}
