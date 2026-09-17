@@ -43,7 +43,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useFinance, useRefreshFinance } from "@/lib/data";
 import { accountBalance, type Commitment } from "@/lib/finance";
-import { formatBRL, formatDate, formatMonthLabel, monthKeyToday, parseISODate, toISODate } from "@/lib/format";
+import {
+  formatBRL,
+  formatDate,
+  formatMonthLabel,
+  monthKeyToday,
+  parseISODate,
+  toISODate,
+} from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/compromissos")({
   head: () => ({
@@ -169,7 +176,8 @@ function ContasFuturas() {
         };
       });
 
-    const projectedFinalBalance = currentTotalBalance + totalPredictedIncome - totalPredictedExpense;
+    const projectedFinalBalance =
+      currentTotalBalance + totalPredictedIncome - totalPredictedExpense;
 
     return {
       currentTotalBalance,
@@ -185,7 +193,9 @@ function ContasFuturas() {
   function startSettling(commitment: Commitment) {
     if (!data) return;
     if (commitment.credit_card_id) {
-      toast.info("Este valor faz parte da fatura do cartão. Pague a fatura para liquidar este compromisso.");
+      toast.info(
+        "Este valor faz parte da fatura do cartão. Pague a fatura para liquidar este compromisso.",
+      );
       navigate({ to: "/cartoes" });
       return;
     }
@@ -334,7 +344,10 @@ function ContasFuturas() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label>Tipo</Label>
-                  <Select value={newKind} onValueChange={(v) => setNewKind(v as "despesa" | "receita")}>
+                  <Select
+                    value={newKind}
+                    onValueChange={(v) => setNewKind(v as "despesa" | "receita")}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -424,7 +437,7 @@ function ContasFuturas() {
       <div className="space-y-6">
         {/* SELETOR DE HORIZONTE */}
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5 rounded-lg border border-border bg-card p-1">
+          <div className="flex max-w-full items-center gap-1.5 overflow-x-auto rounded-lg border border-border bg-card p-1">
             {[
               { id: "30d", label: "Próximos 30 dias" },
               { id: "3m", label: "Próximos 3 meses" },
@@ -436,7 +449,7 @@ function ContasFuturas() {
                 type="button"
                 variant={horizon === tab.id ? "default" : "ghost"}
                 size="sm"
-                className="h-7 rounded-md text-xs font-medium"
+                className="h-7 shrink-0 whitespace-nowrap rounded-md text-xs font-medium"
                 onClick={() => setHorizon(tab.id as Horizon)}
               >
                 {tab.label}
@@ -445,9 +458,14 @@ function ContasFuturas() {
           </div>
 
           {viewData.dueIn7Days.length > 0 && (
-            <Badge variant="outline" className="border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs py-1">
+            <Badge
+              variant="outline"
+              className="border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs py-1"
+            >
               <Clock className="mr-1 h-3.5 w-3.5" />
-              {viewData.dueIn7Days.length} {viewData.dueIn7Days.length === 1 ? "conta vence" : "contas vencem"} nos próximos 7 dias
+              {viewData.dueIn7Days.length}{" "}
+              {viewData.dueIn7Days.length === 1 ? "conta vence" : "contas vencem"} nos próximos 7
+              dias
             </Badge>
           )}
         </div>
@@ -498,7 +516,9 @@ function ContasFuturas() {
               {viewData.maxExpenseMonth.label || "Nenhum no período"}
             </p>
             <p className="text-[11px] text-destructive font-medium mt-0.5">
-              {viewData.maxExpenseMonth.amount > 0 ? formatBRL(viewData.maxExpenseMonth.amount) : "R$ 0,00"}
+              {viewData.maxExpenseMonth.amount > 0
+                ? formatBRL(viewData.maxExpenseMonth.amount)
+                : "R$ 0,00"}
             </p>
           </div>
         </div>
@@ -537,7 +557,10 @@ function ContasFuturas() {
                           </Badge>
                         )}
                         {group.isLow && !group.isNegative && (
-                          <Badge variant="outline" className="border-amber-500/40 text-amber-600 bg-amber-500/10 text-xs">
+                          <Badge
+                            variant="outline"
+                            className="border-amber-500/40 text-amber-600 bg-amber-500/10 text-xs"
+                          >
                             <AlertCircle className="mr-1 h-3 w-3" /> Saldo projetado baixo
                           </Badge>
                         )}
@@ -561,7 +584,9 @@ function ContasFuturas() {
                     <div className="divide-y divide-border">
                       {group.items.map((item) => {
                         const isCard = Boolean(item.credit_card_id);
-                        const card = isCard ? data.cards.find((c) => c.id === item.credit_card_id) : null;
+                        const card = isCard
+                          ? data.cards.find((c) => c.id === item.credit_card_id)
+                          : null;
                         const category = data.categories.find((c) => c.id === item.category_id);
 
                         return (
@@ -619,10 +644,10 @@ function ContasFuturas() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-8 text-xs font-medium"
+                                className="h-8 shrink-0 text-xs font-medium"
                                 onClick={() => startSettling(item)}
                               >
-                                Confirmar pagamento de {formatBRL(item.amount)}
+                                Confirmar pagamento
                               </Button>
                             </div>
                           </div>
@@ -704,9 +729,7 @@ function ContasFuturas() {
               </div>
 
               {error && (
-                <p className="rounded-md bg-destructive/10 p-2 text-xs text-destructive">
-                  {error}
-                </p>
+                <p className="rounded-md bg-destructive/10 p-2 text-xs text-destructive">{error}</p>
               )}
             </div>
           )}
