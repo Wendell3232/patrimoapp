@@ -110,7 +110,7 @@ export function useFinance() {
   return useQuery({
     queryKey: FINANCE_KEY,
     queryFn: fetchFinance,
-    staleTime: 30_000,
+    staleTime: 60_000,
   });
 }
 
