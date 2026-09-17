@@ -1,1 +1,4 @@
-project_id = "qqzerdpiirqlfppdewri"
+project_id = "omwffhlbmhpuidqzjbwv"
+
+[functions.license-webhook]
+verify_jwt = false
